@@ -1,0 +1,1741 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>PingCode · 工作流配置</title>
+<style>
+:root{
+  --primary:#6698ff; --success:#73d897; --warning:#ffcd5d; --danger:#ff7575; --info:#5dcfff;
+  --orange:#fd7e14; --purple:#6f42c1;
+  --g10:#fff; --g70:#f7f7f7; --g80:#fafafa; --g100:#f5f5f5; --g200:#eee;
+  --g300:#ddd; --g400:#cacaca; --g500:#aaa; --g600:#999; --g700:#666; --g800:#333;
+  --r:.25rem;
+  --sd-menu:0 0 16px #00000014;
+  --sd-drawer:-6px 0 18px rgba(0,0,0,.10);
+  --fm:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Helvetica Neue","Noto Sans","Noto Sans CJK SC","Microsoft Yahei",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:var(--fm);font-size:14px;color:var(--g800);background:var(--g70);-webkit-font-smoothing:antialiased;overflow:hidden}
+button{font-family:inherit;cursor:pointer}
+.mono{font-family:"SFMono-Regular",Menlo,Monaco,monospace;font-size:12px}
+
+/* 按钮 */
+.btn{display:inline-block;font-weight:400;text-align:center;white-space:nowrap;border:1px solid transparent;border-radius:var(--r);cursor:pointer;transition:all .15s ease-in-out}
+.btn:focus{outline:0}
+.btn-lg{padding:.375rem 1.25rem;font-size:.875rem;line-height:1.5715;min-width:97px}
+.btn-sm{padding:.125rem 15px;font-size:.875rem;line-height:1.5715;min-width:70px}
+.btn-xs{padding:.125rem 15px;font-size:.75rem;line-height:1.5;min-width:60px}
+.btn-primary{color:#fff;background-color:var(--primary);border-color:var(--primary)}
+.btn-primary:hover{box-shadow:0 2px 5px 1px #6698ff99}
+.btn-default{color:var(--g700);background-color:var(--g200);border-color:var(--g200)}
+.btn-default:hover{color:var(--g800);background-color:var(--g300);border-color:var(--g300)}
+.btn-text{color:var(--g700);background:transparent}
+.btn-text:hover{color:var(--primary)}
+.btn-danger{color:var(--danger);background:transparent;border-color:transparent}
+.btn-danger:hover{background:rgba(255,117,117,.12)}
+.btn[disabled]{color:var(--g400);background-color:var(--g100);border-color:var(--g100);pointer-events:none}
+
+/* 表单 */
+.form-control{display:block;width:100%;color:var(--g800);background:#fff;border:1px solid var(--g200);border-radius:var(--r);font-family:inherit;font-size:13px;padding:5px 8px;height:30px;transition:border-color .15s}
+.form-control:focus{border-color:var(--primary);outline:0}
+textarea.form-control{height:auto;min-height:64px;line-height:1.7;resize:vertical}
+.ck{accent-color:var(--primary);cursor:pointer}
+.ckrow{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--g700);cursor:pointer;white-space:nowrap}
+
+/* 标签 */
+.tag{display:inline-flex;align-items:center;font-size:.75rem;border-radius:var(--r);border:1px solid transparent;padding:0 8px;height:20px;line-height:20px;white-space:nowrap}
+.tag-pill{border-radius:18px;padding:0 12px;height:24px}
+.tag-blue{color:#4a7fe0;background:rgba(102,152,255,.12);border-color:rgba(102,152,255,.4)}
+.tag-green{color:#2c9e63;background:rgba(115,216,151,.18);border-color:rgba(115,216,151,.55)}
+.tag-orange{color:#c26a10;background:rgba(255,205,93,.22);border-color:rgba(255,205,93,.75)}
+.tag-red{color:#d04545;background:rgba(255,117,117,.14);border-color:rgba(255,117,117,.5)}
+.tag-grey{color:var(--g600);background:var(--g100);border-color:var(--g200)}
+.tag-purple{color:var(--purple);background:rgba(111,66,193,.1);border-color:rgba(111,66,193,.35)}
+.tag-count{display:inline-block;color:var(--g600);background:var(--g200);border-radius:1rem;font-size:.75rem;padding:0 6px;line-height:16px;min-width:16px;text-align:center}
+
+/* 被 index.html 内嵌时只保留主区 */
+html.embed .rail, html.embed .pside, html.embed .pnav2{display:none}
+html.embed .pc{background:#fff}
+html.embed .typebar{padding-top:16px}
+
+/* 被 index.html 内嵌时只保留主区 */
+html.embed .rail, html.embed .pside, html.embed .pnav2{display:none}
+html.embed .pc{background:#fff}
+html.embed .typebar{padding-top:16px}
+
+/* 外壳 */
+.pc{display:flex;height:100vh;overflow:hidden;background:#fff}
+.rail{width:200px;flex:none;background:#2b2f36;color:var(--g300);display:flex;flex-direction:column;overflow:hidden;transition:width .18s ease}
+.rail.mini{width:60px}
+.rail-logo{height:48px;display:flex;align-items:center;gap:10px;padding:0 14px;flex:none;color:#fff;cursor:pointer}
+.rail-logo .mk{width:22px;height:22px;flex:none;border-radius:5px;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
+.rail-logo .brand{font-size:14px;font-weight:500;letter-spacing:.2px;white-space:nowrap}
+.rail-logo .fold{margin-left:auto;color:#8b9096;display:flex;align-items:center;padding:4px;border-radius:3px}
+.rail-logo:hover .fold{color:#fff}
+.rail-logo .fold:hover{background:rgba(255,255,255,.1)}
+.rail-scroll{flex:1;overflow:auto;padding:6px 0}
+.rail a{display:flex;align-items:center;gap:10px;padding:0 14px 0 13px;height:38px;color:#b6bbc1;font-size:13.5px;cursor:pointer;white-space:nowrap;border-left:3px solid transparent}
+.rail a:hover{background:rgba(255,255,255,.06);color:#fff}
+.rail a.on{background:#3a3f48;color:#fff;border-left-color:var(--primary)}
+.rail a .ic{flex:none;width:16px;display:flex;justify-content:center}
+.rail-cap{font-size:11px;color:#7d838a;padding:14px 16px 6px;letter-spacing:.5px;white-space:nowrap}
+.rail-foot{flex:none;border-top:1px solid #3d424a;padding:6px 0}
+/* 收起态：只留图标 */
+.rail.mini .rail-logo{padding:0;justify-content:center}
+.rail.mini .rail-logo .brand,.rail.mini .rail-logo .fold,.rail.mini .rail a .tx{display:none}
+.rail.mini .rail-scroll{padding:4px 0}
+.rail.mini .rail a{justify-content:center;padding:0;border-left:none}
+.rail.mini .rail-cap{font-size:0;height:1px;padding:0;margin:9px 12px;background:#3d424a}
+.pc-body{flex:1;min-width:0;display:flex}
+.pside{width:200px;flex:none;background:#fff;border-right:1px solid var(--g200);padding:14px 0;overflow:auto}
+.pside-t{font-size:14px;font-weight:500;padding:0 18px 10px}
+.pside .grp{font-size:11px;color:var(--g600);padding:10px 18px 6px}
+.pside a{display:flex;align-items:center;gap:7px;padding:8px 18px;font-size:13.5px;color:var(--g700);cursor:pointer}
+.pside a:hover{background:var(--g100)}
+.pside a.on{color:var(--primary);font-weight:500;background:rgba(102,152,255,.08)}
+.pside a.dim{color:var(--g500)}
+.nx-tag{margin-left:auto;font-size:10.5px;line-height:16px;color:var(--purple);background:rgba(111,66,193,.1);border:1px solid rgba(111,66,193,.4);border-radius:2px;padding:0 5px}
+
+.pmain{flex:1;min-width:0;display:flex;flex-direction:column;background:#fff}
+.pnav2{display:flex;align-items:center;height:48px;flex:none;border-bottom:1px solid var(--g200);background:#fff;padding:0 20px;gap:2px;flex:none}
+.pnav2 a{height:48px;padding:0 13px;display:flex;align-items:center;font-size:13.5px;color:var(--g700);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+.pnav2 a.on{color:var(--primary);font-weight:500;border-bottom-color:var(--primary)}
+.ptools{height:42px;flex:none;display:flex;align-items:center;gap:10px;padding:0 20px;border-bottom:1px solid var(--g200)}
+.tsearch{display:flex;align-items:center;gap:6px;height:28px;border:1px solid var(--g200);border-radius:var(--r);padding:0 8px;color:var(--g500);font-size:12.5px;min-width:200px}
+.tbtn{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--g700);padding:5px 8px;border:none;background:none;border-radius:var(--r);cursor:pointer}
+.tbtn:hover{color:var(--primary)}
+.tcount{margin-left:auto;font-size:12.5px;color:var(--g600)}
+.scroll{flex:1;overflow:auto;min-height:0}
+.pad{padding:16px 20px 28px}
+
+/* 类型条 */
+.typebar{display:flex;align-items:center;gap:14px;padding:14px 20px 0}
+.typebar .t{font-size:17px;font-weight:600}
+.switch{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--g700);cursor:pointer}
+.switch .track{width:34px;height:18px;border-radius:9px;background:var(--g300);position:relative;transition:background .15s}
+.switch .knob{position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:2px;left:2px;transition:left .15s}
+.switch.on .track{background:var(--primary)}
+.switch.on .knob{left:18px}
+
+/* 页签 */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--g200);padding:0 20px;margin-top:14px;flex:none}
+.tabs button{border:none;background:none;padding:10px 2px;margin-right:22px;font-size:13.5px;color:var(--g700);border-bottom:2px solid transparent;cursor:pointer}
+.tabs button.on{color:var(--primary);font-weight:500;border-bottom-color:var(--primary)}
+
+/* 表格 */
+.tbl{width:100%;border-collapse:collapse;table-layout:fixed}
+.tbl th{text-align:left;font-weight:400;font-size:12.5px;color:var(--g600);padding:9px 10px;border-bottom:1px solid var(--g200);background:var(--g80)}
+.tbl td{padding:11px 10px;border-bottom:1px solid var(--g70);font-size:13px;vertical-align:middle}
+.tbl tbody tr{cursor:pointer}
+.tbl tbody tr:hover td{background:var(--g80)}
+.flowcell{display:inline-flex;align-items:center;gap:8px}
+.flowcell .to{color:var(--g500)}
+.slot{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;border:1px solid var(--g200);border-radius:2px;padding:1px 6px;background:#fff;color:var(--g600)}
+.slot.on{color:#4a7fe0;background:rgba(102,152,255,.08);border-color:rgba(102,152,255,.4)}
+.slot.act{color:#2c9e63;background:rgba(115,216,151,.12);border-color:rgba(115,216,151,.5)}
+
+/* 抽屉 */
+.mask{position:fixed;inset:0;background:rgba(51,51,51,.35);display:none;z-index:50}
+.mask.on{display:block}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:820px;max-width:94vw;background:#fff;box-shadow:var(--sd-drawer);z-index:60;display:none;flex-direction:column}
+.drawer.on{display:flex}
+.dw-head{padding:16px 20px 14px;border-bottom:1px solid var(--g200);flex:none}
+.dw-title{font-size:16px;font-weight:600;display:flex;align-items:center;gap:10px}
+.dw-sub{font-size:12.5px;color:var(--g600);margin-top:6px}
+.dw-x{margin-left:auto;width:26px;height:26px;border:none;background:none;color:var(--g500);font-size:20px;line-height:1;border-radius:var(--r);display:flex;align-items:center;justify-content:center;padding:0 0 2px}
+.dw-x:hover{background:var(--g100);color:var(--g800)}
+.dw-body{flex:1;overflow:auto;padding:16px 20px}
+/* 流转路径条（对齐 ONES 步骤流程条） */
+.step-bar{display:flex;align-items:center;padding:13px 20px;border-bottom:1px solid var(--g200);background:var(--g80);flex:none}
+.step-bar .sn{flex:none;border:1px solid var(--g300);border-radius:14px;padding:3px 15px;font-size:13px;color:var(--g700);background:#fff;white-space:nowrap;line-height:20px}
+.step-bar .sn.cur{border-color:var(--primary);color:var(--primary);background:rgba(102,152,255,.09);font-weight:500}
+.step-bar .line{flex:1;height:1px;background:var(--g300);position:relative;margin:0 10px}
+.step-bar .line i{position:absolute;left:50%;top:-9px;transform:translateX(-50%);background:var(--g80);padding:0 9px;font-size:12px;color:var(--g600);font-style:normal;white-space:nowrap}
+/* 页签（对齐 ONES 步骤配置页签） */
+.dw-tabs{display:flex;gap:26px;padding:0 20px;border-bottom:1px solid var(--g200);flex:none;background:#fff}
+.dw-tabs button{border:none;background:none;padding:11px 0;font-size:13.5px;color:var(--g700);border-bottom:2px solid transparent;cursor:pointer;display:flex;align-items:center;gap:6px}
+.dw-tabs button:hover{color:var(--g800)}
+.dw-tabs button.on{color:var(--primary);font-weight:500;border-bottom-color:var(--primary)}
+.dw-tabs .cnt{font-style:normal;font-size:11px;line-height:16px;min-width:16px;height:16px;padding:0 4px;border-radius:2px;background:var(--g200);color:var(--g700);text-align:center}
+.dw-tabs button.on .cnt{background:rgba(102,152,255,.16);color:var(--primary)}
+/* 页签右侧彩色说明标签：标品升级（橙）/ 打通自动化（紫） */
+.tab-flag{font-style:normal;font-size:10px;line-height:16px;height:16px;padding:0 5px;border-radius:2px;white-space:nowrap}
+.tab-flag.up{color:#c26a10;background:rgba(255,205,93,.22);border:1px solid rgba(255,205,93,.75)}
+.tab-flag.auto{color:var(--purple);background:rgba(111,66,193,.1);border:1px solid rgba(111,66,193,.35)}
+/* 提示条（对齐 ONES info 提示） */
+.info-bar{background:#f2f7ff;border-left:3px solid var(--primary);border-radius:0 var(--r) var(--r) 0;padding:9px 12px;font-size:12.5px;color:#555;line-height:1.95;margin-bottom:16px}
+.info-bar ol{margin:0;padding-left:17px}
+.info-bar li{margin:0}
+.info-bar a{color:var(--primary);text-decoration:none;margin-left:3px}
+/* 页签内主操作按钮 */
+.btn-add{display:inline-flex;align-items:center;gap:4px;height:32px;padding:0 16px;font-size:13px;color:#fff;background:var(--primary);border:1px solid var(--primary);border-radius:var(--r);cursor:pointer;margin-top:12px}
+.btn-add:hover{box-shadow:0 2px 5px 1px #6698ff99}
+.btn-sub{display:inline-flex;align-items:center;height:32px;padding:0 16px;font-size:13px;color:var(--g700);background:#fff;border:1px solid var(--g200);border-radius:var(--r);cursor:pointer;margin-top:12px}
+.btn-sub:hover{color:var(--primary);border-color:var(--primary)}
+/* 表单字段表格 */
+.ftbl{border:1px solid var(--g200);border-radius:var(--r);overflow:hidden;margin-bottom:10px}
+.ftbl-hd,.fld{display:grid;grid-template-columns:13px 100px 78px 54px 86px 86px 1fr 40px;gap:8px;align-items:center;padding:8px 10px}
+.fld-cond{margin:0 10px 10px 20px;padding:0 12px 2px;background:#f7f9ff;border-left:3px solid rgba(102,152,255,.5);border-radius:0 4px 4px 0;border-bottom:1px solid var(--g70)}
+.fc-sec{padding:3px 0 5px}
+.fc-sec+.fc-sec{border-top:1px dashed #e6e9ef}
+.fc-hd{display:flex;align-items:center;gap:8px;padding:5px 0 3px;min-width:0}
+.fc-hd b{font-size:12.5px;color:var(--g800);flex:none}
+.fc-sub{font-size:11.5px;color:var(--g500);flex:none}
+.fc-sum{font-size:11.5px;color:var(--g600);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.fc-tg{margin-left:auto;flex:none;border:none;background:none;color:var(--primary);font-size:11.5px;cursor:pointer;padding:2px 5px;border-radius:3px}
+.fc-tg:hover{background:rgba(102,152,255,.12)}
+.fc-bd{padding-top:2px}
+.fc-read{font-size:11.5px;color:var(--g600);padding:7px 2px 2px;line-height:1.7}
+.fld-cond .cond-block{border-color:rgba(102,152,255,.3)}
+.fld-cond .cond-row{grid-template-columns:13px 104px 156px 90px 1fr 28px}
+.fld-cond .cond-group-ft{padding:2px 8px 5px}
+.fld-cond .form-control{min-width:0}
+.sec-h{font-size:12.5px;color:var(--g700);font-weight:500;margin:18px 0 8px;display:flex;align-items:baseline;gap:8px}
+.sec-h span{font-size:11.5px;color:var(--g500);font-weight:400}
+.sec-h:first-child{margin-top:4px}
+.grp-hd input[data-gn]{border-color:transparent;background:transparent;font-weight:600;color:var(--g800);padding-left:5px}
+.grp-hd input[data-gn]:hover{border-color:var(--g200);background:#fff}
+.grp-hd input[data-gn]:focus{border-color:var(--primary);background:#fff}
+.ftbl-hd{font-size:12px;color:var(--g600);background:var(--g80);border-bottom:1px solid var(--g200)}
+.fld{border-bottom:1px solid var(--g70);font-size:13px}
+.fld:last-child{border-bottom:none}.cond-block{border:1px solid var(--g200);border-radius:var(--r);background:#fff}
+.cond-item-body{padding:2px 0}
+.cond-conn{display:flex;align-items:center;padding:1px 12px 1px 24px;position:relative}
+.cond-conn:before{content:'';position:absolute;left:19px;top:0;bottom:0;border-left:1px dashed var(--g300)}
+.csel{width:58px!important;height:24px;text-align:center;padding:0 2px;font-size:12px;color:var(--g700);background:var(--g80)}
+.cond-group{border:1px solid var(--g300);border-radius:var(--r);background:#fff;margin:4px 12px}
+.cond-group-hd{display:flex;align-items:center;gap:8px;padding:5px 10px;background:var(--g80);border-bottom:1px solid var(--g200);font-size:12px;color:var(--g600);border-radius:var(--r) var(--r) 0 0}
+.cond-group-ft{display:flex;gap:2px;padding:2px 10px 5px}
+.cond-none{padding:10px 12px;font-size:12px;color:var(--g500)}
+.cond-summary{margin-top:10px;padding:9px 12px;background:var(--g80);border-radius:var(--r);font-size:12px;color:var(--g700);line-height:1.8}
+.cond-summary b{color:var(--g800);margin-right:6px}
+.cond-row{display:grid;grid-template-columns:13px 112px 168px 92px 1fr 28px;gap:8px;align-items:center;padding:7px 12px;border-bottom:1px solid var(--g70)}
+/* 行尾删除按钮压成 24px 方块，避免撑出轨道（.btn-xs 默认 min-width:60px） */
+.cond-row > .btn-xs{min-width:0;width:24px;padding:0;justify-self:end;text-align:center}
+/* 流转条件行：效果标注（隐藏入口 / 点击校验）内嵌在类型按钮里，行仍 6 列；类型列加宽 */
+.cond-row.gated{grid-template-columns:13px 152px 130px 92px 1fr 24px}
+.gate-tag{flex:none;font-size:10px;line-height:16px;height:16px;padding:0 4px;border-radius:3px;border:1px solid transparent;white-space:nowrap}
+.cond-row:last-child{border-bottom:none}
+.cond-row .form-control{min-width:0}
+.cond-na{font-size:12px;color:var(--g500)}
+
+/* ---- 来源标签：内置不标，来自 Ping Runner 的带底色小字 ---- */
+.src-chip{flex:none;font-size:10px;line-height:15px;padding:0 5px;border-radius:3px;background:rgba(111,66,193,.12);color:var(--purple);font-weight:500;white-space:nowrap}
+/* ---- 自定义下拉：选项里可带来源标签（原生 select 放不了样式） ---- */
+.dd-btn{display:flex;align-items:center;gap:5px;width:100%;min-width:0;height:30px;padding:0 7px;border:1px solid var(--g300);border-radius:var(--r);background:#fff;font-size:13px;color:var(--g800);text-align:left}
+.dd-btn:hover{border-color:var(--primary)}
+.dd-btn .dd-tx{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dd-btn .dd-cr{flex:none;color:var(--g500);font-size:9px;line-height:1}
+.dd-pop{position:fixed;z-index:130;min-width:252px;max-height:330px;overflow:auto;background:#fff;border:1px solid var(--g200);border-radius:var(--r);box-shadow:0 8px 26px rgba(0,0,0,.15);padding:4px;display:none}
+.dd-pop.on{display:block}
+.dd-grp{padding:8px 8px 3px;font-size:11px;color:var(--g500);display:flex;align-items:center;gap:6px}
+.dd-grp.line{height:1px;background:var(--g100);padding:0;margin:5px 0 3px}
+.dd-it{display:flex;align-items:center;gap:8px;width:100%;padding:6px 8px;border:none;background:none;border-radius:3px;text-align:left;font-size:13px;color:var(--g800)}
+.dd-it:hover{background:var(--g80)}
+.dd-it.on{background:rgba(102,152,255,.10)}
+.dd-it .dd-n{flex:1;min-width:0}
+.dd-it .dd-n i{display:block;font-style:normal;font-size:11px;color:var(--g500);margin-top:1px;line-height:1.4}
+/* Ping Runner 类条件的行内控件说明 */
+.pr-note{font-size:11px;color:var(--g500);display:flex;align-items:center;gap:5px;min-width:0}
+.pr-note code{font-family:"SFMono-Regular",Menlo,Monaco,monospace;font-size:11px;color:var(--purple);background:rgba(111,66,193,.07);padding:1px 4px;border-radius:2px}
+/* Ping Runner 类型条件的行：控件数量不定，改用 flex 排，删除按钮靠右 */
+.cond-row.pr-row{display:flex;gap:8px;align-items:center}
+.cond-row.pr-row .dd-btn{width:auto;flex:none;max-width:210px}
+.cond-row.pr-row .dd-btn .dd-tx{flex:none}
+.cond-row.pr-row select.form-control{width:auto;min-width:140px;max-width:240px;flex:none}
+.cond-row.pr-row input.form-control{flex:1;min-width:130px}
+.cond-row.pr-row .pr-note{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cond-row.pr-row>button[data-idx]{flex:none;margin-left:auto}
+/* 摘要里 Ping Runner 标签与文字的间距 */
+.cond-summary .src-chip,.fc-read .src-chip,.fc-sum .src-chip{margin-right:5px;vertical-align:1px}
+
+/* ---- 拖拽排序：悬停行才出现把手 ---- */
+.drag-h{width:13px;flex:none;display:inline-flex;align-items:center;justify-content:center;height:20px;border-radius:2px;cursor:grab;opacity:0;transition:opacity .12s,background .12s;color:var(--g400)}
+.drag-h::before{content:"";width:9px;height:13px;background-image:radial-gradient(circle,currentColor 1.1px,transparent 1.3px);background-size:4.5px 4.5px;background-position:0 1px}
+.drag-h:hover{background:rgba(102,152,255,.14);color:var(--primary)}
+.drag-h:active{cursor:grabbing}
+.fld-cell:hover>.fld .drag-h,.cond-row:hover .drag-h,.act-card:hover .drag-h,.grp-hd:hover .drag-h{opacity:1}
+.act-top .drag-h{margin-left:-5px}
+.grp-hd .drag-h{margin-left:-4px}
+.fld-cell.dragging,.cond-row.dragging,.act-card.dragging,.grp-box.dragging{opacity:.45;background:rgba(102,152,255,.06);outline:1px dashed rgba(102,152,255,.7);outline-offset:-1px}
+/* 字段行与其条件面板包成一个整体，拖动时不拆散 */
+.fld-cell{border-bottom:1px solid var(--g70)}
+.fld-cell:last-child{border-bottom:none}
+.fld-cell .fld{border-bottom:none}
+.fld-cell .fld-cond{margin-top:0}
+.dw-foot{flex:none;padding:12px 20px;border-top:1px solid var(--g200);display:flex;align-items:center;gap:10px}
+.dw-foot .hintx{flex:1;font-size:12px;color:var(--g600)}
+.sec{margin-bottom:6px;padding-bottom:18px;border-bottom:1px solid var(--g70)}
+.sec:last-child{border-bottom:none;padding-bottom:2px}
+.sec-h{display:flex;align-items:center;gap:8px}
+.sec-h .bar{width:3px;height:14px;border-radius:2px;background:var(--primary);flex:none}
+.sec-h .t{font-size:14px;font-weight:600;color:var(--g800)}
+.sec-h .r{margin-left:auto;display:flex;gap:8px;align-items:center}
+.sec-d{font-size:12px;color:var(--g600);line-height:1.7;margin:5px 0 12px 11px}
+.sec-d b{color:var(--g700);font-weight:600}
+
+.row-c{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.row-c select.form-control{width:auto;min-width:118px}
+.row-c .ph{color:var(--g500)}
+.act-card{border:1px solid var(--g200);border-radius:var(--r);padding:10px 12px;margin-bottom:8px;background:#fff}
+.act-card:hover{border-color:var(--g300)}
+.act-top{display:flex;align-items:center;gap:8px}
+.act-top .nm{font-size:13px;font-weight:500}
+.act-top .op{margin-left:auto;display:flex;gap:6px}
+.act-cfg{margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;color:var(--g600)}
+.act-cfg select.form-control{width:auto;min-width:200px}
+.note{border-left:3px solid var(--primary);background:rgba(102,152,255,.07);padding:9px 12px;font-size:12.5px;color:var(--g700);line-height:1.8;border-radius:0 var(--r) var(--r) 0}
+.note.warn{border-left-color:var(--warning);background:rgba(255,205,93,.13)}
+.note.ok{border-left-color:var(--success);background:rgba(115,216,151,.14)}
+.note b{color:var(--g800)}
+.fm-hd,.fm-row{display:flex;align-items:center;gap:10px;padding:7px 10px;font-size:13px}
+.fm-hd{font-size:12px;color:var(--g600);background:var(--g80);border:1px solid var(--g200);border-radius:var(--r) var(--r) 0 0}
+.fm-row{border:1px solid var(--g200);border-top:none}
+.fm-row:last-child{border-radius:0 0 var(--r) var(--r)}
+.fm-row>span:first-child{flex:1;color:var(--g800)}
+.fm-row .op{display:flex;gap:4px;justify-content:flex-end}
+.slot.fm{color:#6f42c1;background:rgba(111,66,193,.08);border-color:rgba(111,66,193,.35)}
+.slot.fm.on{color:var(--purple);background:rgba(111,66,193,.12);border-color:rgba(111,66,193,.45)}
+.fmask{position:fixed;inset:0;background:rgba(51,51,51,.45);display:none;z-index:70}
+.fmask.on{display:flex;align-items:center;justify-content:center}
+.fbox{width:560px;max-width:92vw;max-height:84vh;background:#fff;border-radius:8px;box-shadow:0 12px 48px rgba(0,0,0,.18);display:flex;flex-direction:column;overflow:hidden}
+.fbox .fh{padding:14px 18px 12px;border-bottom:1px solid var(--g200);display:flex;align-items:center;gap:10px}
+.fbox .fx{margin-left:auto;width:24px;height:24px;border:none;background:none;color:var(--g500);font-size:18px;line-height:1;border-radius:var(--r);display:flex;align-items:center;justify-content:center;padding:0 0 2px}
+.fbox .fx:hover{background:var(--g100);color:var(--g800)}
+.fbox .fb{padding:16px 18px;overflow:auto}
+.fbox .ff{padding:12px 18px;border-top:1px solid var(--g200);display:flex;gap:10px;align-items:center}
+.spec-card{border:1px solid var(--g200);border-radius:var(--r);background:var(--g80);padding:10px 12px;margin-bottom:12px}
+.spec-grid{display:grid;grid-template-columns:1fr 130px 1fr;gap:10px 14px}
+.spec-grid .lb{display:block;font-size:11.5px;color:var(--g600);margin-bottom:4px}
+.grp-box{border:1px solid var(--g200);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
+.grp-hd{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--g80);border-bottom:1px solid var(--g200)}
+.fld .form-control{min-width:0}
+.fld .fk{color:var(--g800);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fld .op{display:flex;gap:2px;justify-content:flex-end;align-items:center}
+.fld .op .btn{min-width:24px;padding:2px 4px}
+.cond-box{border:1px solid var(--g200);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
+.cond-hd{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--g80);border-bottom:1px solid var(--g200);font-size:12.5px;color:var(--g700)}
+.cond-row:last-child{border-bottom:none}
+.fm-tabs{display:flex;gap:2px;border-bottom:1px solid var(--g200);padding:0 14px}
+.fm-tabs button{border:none;background:none;padding:9px 2px;margin-right:18px;font-size:13.5px;color:var(--g700);border-bottom:2px solid transparent;cursor:pointer}
+.fm-tabs button.on{color:var(--primary);font-weight:500;border-bottom-color:var(--primary)}
+.fm-pane{display:none}
+.fm-pane.on{display:block}
+.empty{border:1px dashed var(--g300);border-radius:var(--r);padding:12px;text-align:center;color:var(--g600);font-size:12.5px;background:var(--g80)}
+
+/* 流程图 */
+.canvas{position:relative;background:#fff;border:1px solid var(--g200);border-radius:var(--r);overflow:auto}
+.cv-tip{position:absolute;right:16px;bottom:16px;font-size:11.5px;color:var(--g600);background:rgba(255,255,255,.95);border:1px solid var(--g200);border-radius:12px;padding:2px 9px;pointer-events:none;z-index:2}
+.cv-inner{position:relative;padding:30px}
+.node{position:absolute;width:132px;border:1px solid var(--g200);border-radius:var(--r);background:#fff;padding:8px 10px;text-align:center;cursor:pointer}
+.node:hover{border-color:var(--primary);box-shadow:0 2px 8px rgba(102,152,255,.18)}
+.node.sel{border-color:var(--primary);box-shadow:0 0 0 3px rgba(102,152,255,.16)}
+.node .nm{font-size:12.5px;color:var(--g800);margin-bottom:5px}
+.node.has{box-shadow:0 0 0 2px rgba(115,216,151,.5)}
+.edge{position:absolute;height:1px;background:var(--g300);transform-origin:0 50%}
+.edge .lbl{position:absolute;left:50%;top:-20px;font-size:11px;color:var(--g600);background:#fff;padding:0 5px;white-space:nowrap;transform-origin:50% 50%}
+.edge .arw{position:absolute;right:-4px;top:-3.5px;width:6px;height:6px;border-top:1px solid currentColor;border-right:1px solid currentColor;transform:rotate(45deg);color:var(--g300)}
+.edge.rl .arw{color:var(--primary)}
+.edge.rl{background:var(--primary)}
+.legend{display:flex;gap:16px;align-items:center;font-size:12px;color:var(--g600);padding:10px 20px 0}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+
+.toast{position:fixed;top:60px;left:50%;transform:translateX(-50%) translateY(-16px);background:#fff;border-radius:var(--r);box-shadow:0 2px 8px rgba(0,0,0,.26);padding:10px 16px;font-size:13px;display:flex;align-items:center;gap:9px;z-index:200;opacity:0;pointer-events:none;transition:.22s;border-left:3px solid var(--success);max-width:640px}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.toast.info{border-left-color:var(--primary)}
+</style>
+</head>
+<body>
+
+<div class="pc">
+  <!-- 一级导航（展开态：logo + 文字） -->
+  <aside class="rail" id="railBox">
+    <div class="rail-logo" id="railLogo" title="PingCode">
+      <span class="mk">P</span><span class="brand">PingCode</span>
+      <span class="fold" id="foldBtn" title="收起导航"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 3.5L5.5 8l4.5 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </div>
+    <div class="rail-scroll" id="rail"></div>
+    <div class="rail-foot" id="railFoot"></div>
+  </aside>
+
+  <div class="pc-body">
+    <!-- 项目设置菜单 -->
+    <aside class="pside">
+      <div class="pside-t">项目设置</div>
+      <div class="grp">通用</div>
+      <a class="dim">项目成员</a><a class="dim">标签管理</a><a class="dim">自动化规则</a><a class="dim">回收站</a>
+      <div class="grp">流程</div>
+      <a class="dim">项目组件</a><a class="dim">项目属性</a><a class="dim">项目状态</a><a class="on">工作项配置</a><a class="dim">评审配置</a>
+      <div class="grp">设置</div>
+      <a class="dim">基本信息</a><a class="dim">高级设置</a>
+    </aside>
+
+    <main class="pmain">
+      <div class="pnav2">
+        <a>概览</a><a>规划</a><a>里程碑</a><a>工作项</a><a class="on">工作项配置</a><a>更多</a>
+      </div>
+
+      <div class="typebar">
+        <span class="t">缺陷</span>
+        <span class="tag tag-blue tag-pill">9 状态</span>
+        <span class="tag tag-grey tag-pill">38 属性</span>
+        <label class="switch on" id="localSw"><span class="track"><span class="knob"></span></span>开启本地配置</label>
+        <span style="font-size:12px;color:var(--g600)">已开启，本类型的配置与全局隔离</span>
+      </div>
+
+      <div class="tabs" id="tabs">
+        <button class="on" data-v="flow">状态流转</button>
+        <button data-v="state">状态</button>
+        <button data-v="graph">流程图</button>
+      </div>
+
+      <div class="ptools">
+        <div class="tsearch" id="q">搜索流转</div>
+        <button class="tbtn" id="onlyRule">只看有规则的</button>
+        <span class="tcount" id="cnt"></span>
+      </div>
+
+      <div class="scroll" id="body"></div>
+    </main>
+  </div>
+</div>
+
+<div class="mask" id="mask"></div>
+<aside class="drawer" id="drawer">
+  <div class="dw-head">
+    <div class="dw-title"><span id="dwName">流转</span><span class="tag tag-grey" id="dwBadge">无规则</span>
+      <button class="dw-x" id="dwClose" title="关闭">×</button></div>
+    <div class="dw-sub" id="dwSub"></div>
+  </div>
+  <div class="step-bar" id="dwStep"></div>
+  <div class="dw-tabs" id="dwTabs"></div>
+  <div class="dw-body" id="dwBody"></div>
+  <div class="dw-foot">
+    <span class="hintx" id="dwHint"></span>
+    <button class="btn btn-default btn-lg" id="dwCancel">取消</button>
+    <button class="btn btn-primary btn-lg" id="dwSave">保存</button>
+  </div>
+</aside>
+
+<div class="fmask" id="fmask"></div>
+<div class="toast" id="toast"><span id="toastTx"></span></div>
+<div class="dd-pop" id="ddPop"></div>
+
+<script>
+/* ============================ 数据 ============================ */
+var STATE_CATS = [
+  { n:'未开始', c:'tag-grey' },
+  { n:'正常',   c:'tag-blue' },
+  { n:'预警',   c:'tag-orange' },
+  { n:'延期',   c:'tag-red' },
+  { n:'结束',   c:'tag-green' }
+];
+var STATES = [
+  { id:'s1', n:'待处理',  cat:'未开始' },
+  { id:'s2', n:'定位中',  cat:'正常' },
+  { id:'s3', n:'审核中',  cat:'正常' },
+  { id:'s4', n:'待验证',  cat:'正常' },
+  { id:'s5', n:'挂起',    cat:'预警' },
+  { id:'s6', n:'驳回',    cat:'延期' },
+  { id:'s7', n:'已解决',  cat:'结束' },
+  { id:'s8', n:'已验证',  cat:'结束' },
+  { id:'s9', n:'已关闭',  cat:'结束' }
+];
+
+var FLOWS = [
+  { id:'f1', n:'提交定位', from:'待处理', to:'定位中', visible:true,
+    condOn:{ conn:'AND', items:[] }, conds:{ conn:'AND', items:[] }, acts:[],
+    form:{ title:'', size:'md', submitText:'提交并流转', groups:[
+      { id:'g1', name:'定位信息', fields:[
+        { key:'问题修改责任人', ctl:'member', bind:true, req:true, ph:'指派给实际处理人', def:'' },
+        { key:'计划完成时间', ctl:'date', bind:true, req:false, ph:'', def:'' }
+      ]}
+    ]}},
+
+  { id:'f2', n:'提交审核', from:'定位中', to:'审核中', visible:true,
+    condOn:{ conn:'AND', items:[
+      { t:'c', kind:'system', f:'当前用户', op:'eq', v:'审核修改责任人' },
+      { t:'c', kind:'pscript', f:'必须有复现步骤' }
+    ] },
+    conds:{ conn:'AND', items:[
+      { t:'c', kind:'field', f:'缺陷类型', op:'ne', v:'文档缺陷' },
+      { t:'c', kind:'linked', f:'子工作项全部完成', op:'eq', v:'' },
+      { t:'c', kind:'ppattern', f:'GerritID', v:'^I[0-9a-f]{8,40}$' }
+    ] },
+    acts:[ { t:'set_field', f:'审核修改责任人', v:'按映射表解析', mode:'sync', rt:3, rg:5 },
+           { t:'pscript', f:'按映射表回写责任人', mode:'sync', rt:3, rg:5 } ],
+    form:{ title:'提交审核', size:'md', submitText:'提交审核', groups:[
+      { id:'g1', name:'定位结论', fields:[
+        { key:'问题定位结论', ctl:'textarea', bind:true, req:'cond', show:'cond', ph:'描述根因与定位过程', def:'',
+          reqCond:{ conn:'AND', items:[ { t:'c', kind:'field', f:'严重程度', op:'eq', v:'致命' } ] },
+          showCond:{ conn:'AND', items:[ { t:'c', kind:'field', f:'严重程度', op:'in', v:'致命 / 严重' } ] } }
+      ]},
+      { id:'g2', name:'代码与验证', fields:[
+        { key:'GerritID', ctl:'text', bind:true, req:true, ph:'I 开头 + 8~40 位十六进制', def:'' },
+        { key:'修复版本', ctl:'select', bind:true, req:true, ph:'请选择', def:'' },
+        { key:'自测结论', ctl:'textarea', bind:false, req:false, ph:'仅记录在本次流转，不写入属性', def:'' }
+      ]}
+    ]}},
+
+  { id:'f3', n:'审核通过', from:'审核中', to:'待验证', visible:true,
+    condOn:{ conn:'AND', items:[
+      { t:'c', kind:'system', f:'当前用户所属角色', op:'eq', v:'子系统负责人' },
+      { t:'g', conn:'OR', items:[
+        { t:'c', kind:'field', f:'严重程度', op:'eq', v:'致命' },
+        { t:'c', kind:'field', f:'复现概率', op:'eq', v:'必现' }
+      ]}
+    ] },
+    conds:{ conn:'AND', items:[
+      { t:'c', kind:'field', f:'严重程度', op:'in', v:'致命,严重' },
+      { t:'c', kind:'field', f:'处理记录', op:'ne', v:'' }
+    ] },
+    acts:[
+      { t:'assign', who:'验证责任人', mode:'sync', rt:3, rg:5 },
+      { t:'add_tag', v:'待验证', mode:'async', rt:2, rg:10 },
+      { t:'create_sub', v:'验证记录', mode:'sync', rt:3, rg:5 }
+    ],
+    form:{ title:'审核通过', size:'lg', submitText:'通过并转验证', groups:[
+      { id:'g1', name:'审核意见', fields:[
+        { key:'审核意见', ctl:'textarea', bind:true, req:true, ph:'请填写审核结论', def:'' }
+      ]},
+      { id:'g2', name:'验证安排', fields:[
+        { key:'验证责任人', ctl:'member', bind:true, req:true, ph:'', def:'' },
+        { key:'验证计划时间', ctl:'date', bind:true, req:false, ph:'', def:'' },
+        { key:'是否需要回归', ctl:'select', bind:true, req:false, ph:'请选择', def:'' }
+      ]},
+      { id:'g3', name:'内部备注', fields:[
+        { key:'审核备注（内部）', ctl:'textarea', bind:false, req:false, ph:'仅记录在本次流转，不写入属性', def:'' }
+      ]}
+    ]}},
+
+  { id:'f4', n:'直接解决', from:'审核中', to:'已解决', visible:true,
+    condOn:{ conn:'AND', items:[] },
+    conds:{ conn:'AND', items:[
+      { t:'c', kind:'field', f:'缺陷类型', op:'in', v:'文档缺陷,测试用例缺陷' }
+    ] },
+    acts:[ { t:'add_tag', v:'免验证', mode:'sync', rt:1, rg:5 },
+           { t:'http', method:'POST', url:'https://openapi.pingcode.com/pjm/tickets/close', mode:'async', rt:5, rg:30 } ],
+    form:{ title:'', size:'sm', submitText:'直接关闭', groups:[
+      { id:'g1', name:'关闭说明', fields:[
+        { key:'解决结果', ctl:'select', bind:true, req:true, ph:'请选择', def:'' },
+        { key:'解决方案', ctl:'textarea', bind:true, req:true, ph:'', def:'' }
+      ]}
+    ]}},
+
+  { id:'f5', n:'验证通过', from:'待验证', to:'已验证', visible:false,
+    condOn:{ conn:'AND', items:[
+      { t:'c', kind:'field', f:'验证记录', op:'ne', v:'' }
+    ] },
+    conds:{ conn:'AND', items:[
+      { t:'c', kind:'linked', f:'关联缺陷已关闭', op:'eq', v:'' }
+    ] },
+    acts:[ { t:'set_field', f:'修复版本', v:'当前流转目标状态', mode:'sync', rt:2, rg:5 } ],
+    form:{ title:'', size:'md', submitText:'', groups:[
+      { id:'g1', name:'验证结论', fields:[
+        { key:'验证记录', ctl:'textarea', bind:true, req:true, ph:'记录验证过程与结论', def:'' },
+        { key:'残留问题数', ctl:'number', bind:true, req:false, ph:'0', def:'' }
+      ]}
+    ]}},
+
+  /* 审核驳回：审核中 → 驳回（小米两条驳回回流之一，另一条是 f6 验证驳回） */
+  { id:'f10', n:'审核驳回', from:'审核中', to:'驳回', visible:true,
+    condOn:{ conn:'AND', items:[
+      { t:'c', kind:'system', f:'当前用户所属角色', op:'eq', v:'子系统负责人' }
+    ] },
+    conds:{ conn:'AND', items:[] },
+    acts:[ { t:'incr', f:'驳回次数', v:'1', mode:'sync', rt:2, rg:5 },
+           { t:'comment', v:'审核不通过，已退回修改', mode:'sync', rt:2, rg:5 },
+           { t:'assign', who:'按「子系统 → 责任人」映射表解析', mode:'sync', rt:3, rg:5 } ],
+    form:{ title:'审核驳回', size:'md', submitText:'驳回', groups:[
+      { id:'g1', name:'驳回信息', fields:[
+        { key:'审核意见', ctl:'textarea', bind:true, req:true, ph:'说明本次不通过的原因', def:'' },
+        { key:'驳回原因', ctl:'select', bind:true, req:true, ph:'请选择', def:'' }
+      ]}
+    ]}},
+
+  { id:'f6', n:'验证驳回', from:'待验证', to:'驳回', visible:true,
+    condOn:{ conn:'AND', items:[] }, conds:{ conn:'AND', items:[] },
+    acts:[ { t:'incr', f:'驳回次数', v:'1', mode:'sync', rt:2, rg:5 },
+           { t:'comment', v:'验证不通过，已退回修改', mode:'sync', rt:2, rg:5 },
+           { t:'assign', who:'按「子系统 → 责任人」映射表解析', mode:'sync', rt:3, rg:5 } ],
+    form:{ title:'验证驳回', size:'md', submitText:'驳回', groups:[
+      { id:'g1', name:'驳回信息', fields:[
+        { key:'验证记录', ctl:'textarea', bind:true, req:true, ph:'', def:'' },
+        { key:'驳回原因', ctl:'select', bind:true, req:true, ph:'请选择', def:'' }
+      ]}
+    ]}},
+
+  { id:'f7', n:'重新提交', from:'驳回', to:'审核中', visible:true,
+    condOn:{ conn:'AND', items:[] }, conds:{ conn:'AND', items:[] }, acts:[],
+    form:{ title:'', size:'md', submitText:'', groups:[
+      { id:'g1', name:'修改说明', fields:[
+        { key:'处理记录', ctl:'textarea', bind:true, req:true, ph:'说明本次修改内容', def:'' },
+        { key:'GerritID', ctl:'text', bind:true, req:true, ph:'I 开头 + 8~40 位十六进制', def:'' }
+      ]}
+    ]}},
+
+  { id:'f8', n:'挂起', from:'定位中', to:'挂起', visible:true,
+    condOn:{ conn:'AND', items:[] }, conds:{ conn:'AND', items:[] },
+    acts:[ { t:'comment', v:'缺陷挂起', mode:'sync', rt:1, rg:5 } ],
+    form:{ title:'挂起', size:'sm', submitText:'挂起', groups:[
+      { id:'g1', name:'挂起原因', fields:[
+        { key:'挂起原因', ctl:'select', bind:true, req:true, ph:'请选择', def:'' },
+        { key:'预计恢复时间', ctl:'date', bind:true, req:false, ph:'', def:'' }
+      ]}
+    ]}},
+
+  { id:'f9', n:'关闭', from:'已验证', to:'已关闭', visible:true,
+    condOn:{ conn:'AND', items:[] },
+    conds:{ conn:'AND', items:[
+      { t:'c', kind:'linked', f:'存在未关闭的重复单', op:'empty', v:'' }
+    ] },
+    acts:[ { t:'webhook', v:'https://客户系统/缺陷关闭回调', mode:'async', rt:5, rg:60 },
+           { t:'notify', v:'站内信', mode:'async', rt:3, rg:10 } ],
+    form:{ title:'', size:'sm', submitText:'', groups:[
+      { id:'g1', name:'关闭确认', fields:[
+        { key:'关闭说明', ctl:'textarea', bind:true, req:true, ph:'', def:'' }
+      ]}
+    ]}}
+];
+
+var FIELDS = ['缺陷类型','严重程度','复现概率','子系统 / 领域','模块','风险等级','解决结果','处理记录','验证记录','驳回次数','GerritID','关联重复单','影响版本','修复版本','问题修改责任人','审核修改责任人','验证责任人','优先级','迭代','子工作项'];
+var OPS = ['eq','ne','in','contains','empty','notempty','gt','lt'];
+var OP_TXT = { eq:'等于', ne:'不等于', in:'属于', contains:'包含', empty:'为空', notempty:'不为空', gt:'大于', lt:'小于' };
+/* 枚举字段的候选值：条件里选到这些字段时，「值」直接给下拉，避免手输 */
+var FIELD_VALS = {
+  '缺陷类型':['功能缺陷','性能缺陷','稳定性缺陷','功耗缺陷','文档缺陷','工艺缺陷','不修复（需CCB）','被克隆'],
+  '严重程度':['致命','严重','一般','轻微'],
+  '复现概率':['必现','高','中','低'],
+  '风险等级':['致命','严重','一般','提示'],
+  '解决结果':['已修复','不修复','不修复（需CCB）','重复单','外部原因','无法复现'],
+  '子系统 / 领域':['DDR 控制器','SoC 平台','NPU','ISP 影像','PMIC 电源','显示与触控'],
+  '模块':['DDR 控制器核','SoC 总线互联','NPU 张量计算核','ISP 影像通路','PMIC 充电通路'],
+  '优先级':['P0','P1','P2','P3']
+};
+/* ---- 条件 / 校验的类型表：内置 + 来自 Ping Runner（对标 Jira 插件注册机制） ----
+   src:'in' 内置；src:'pr' 由 Ping Runner 提供，界面上带底色小字后缀 */
+var COND_KINDS = {
+  field:  { n:'工作项字段',   src:'in', d:'按工作项属性值判断', gate:'check' },
+  system: { n:'系统上下文',   src:'in', d:'当前用户 / 时间 / 迭代', gate:'show' },
+  linked: { n:'关联对象',     src:'in', d:'子工作项、关联单状态', gate:'check' },
+  pscript:{ n:'脚本条件',     src:'pr', d:'Groovy 脚本返回 true 才放行', gate:'check' },
+  pjql:   { n:'Scripted PQL 条件', src:'pr', d:'PQL 查到结果才放行', gate:'check' },
+  puattr: { n:'用户属性判断', src:'pr', d:'按当前用户的属性判断', gate:'show' },
+  pvalid: { n:'脚本校验',     src:'pr', d:'脚本返回错误信息即拦截提交', gate:'check' },
+  puniq:  { n:'唯一性校验',   src:'pr', d:'同项目内该字段值不可重复', gate:'check' },
+  ppattern:{ n:'正则校验',    src:'pr', d:'字段值需匹配正则，否则拦截', gate:'check' }
+};
+/* gate:'show' ＝ 不满足时隐藏流转入口；gate:'check' ＝ 入口照常展示，点击时校验并报错 */
+/* 流转条件 / 字段级条件可用的类型 */
+var COND_ORDER  = ['field','system','linked','pscript','pjql','puattr'];
+/* 流转验证可用的类型 */
+var VALID_ORDER = ['field','system','linked','pvalid','puniq','ppattern'];
+
+/* Ping Runner 脚本库（模拟：真实产品里这里读脚本注册表） */
+var PR_SCRIPTS = {
+  cond: [
+    ['仅验证责任人可提交', 'issue.assignee == currentUser'],
+    ['必须有复现步骤', 'cf["复现步骤"] != null'],
+    ['严重程度不可自行降级', 'issue.priority.rank >= cf["严重程度"].rank'],
+    ['关联需求已进入提测', 'linked("需求").status in ["提测中","已上线"]']
+  ],
+  valid: [
+    ['GerritID 必须是已合入提交', 'gerrit.isMerged(cf["GerritID"])'],
+    ['修复版本不得早于影响版本', 'cf["修复版本"] >= cf["影响版本"]'],
+    ['流转必须填写测试结论', 'cf["自测结论"] != null || "缺少自测结论"']
+  ],
+  post: [
+    ['按映射表回写责任人', 'map("子系统 → 责任人").write(issue)'],
+    ['同步到客户工单系统', 'http.post("https://…/sync", issue)']
+  ]
+};
+
+var ACTS = {
+  set_field:{ n:'改字段', d:'更新工作项属性', src:'in' },
+  incr:     { n:'字段自增', d:'数值字段按步长累加', src:'in' },
+  assign:   { n:'指派',   d:'指派给成员或用户组', src:'in' },
+  add_tag:  { n:'加标签',  d:'添加标签', src:'in' },
+  comment:  { n:'加评论',  d:'写入评论', src:'in' },
+  create_sub:{n:'创建子工作项', d:'在指定类型下新建子单', src:'in' },
+  relate:   { n:'关联工作项', d:'建立关联关系', src:'in' },
+  notify:   { n:'通知',   d:'站内信 / 邮件', src:'in' },
+  http:     { n:'调用开放 API', d:'发起 HTTP 请求', src:'in' },
+  webhook:  { n:'Webhook', d:'向外部系统推送', src:'in' },
+  trigger:  { n:'触发自动化规则', d:'调用已有自动化规则', src:'in' },
+  pscript:  { n:'执行脚本', d:'Groovy 脚本，可读写工作项', src:'pr' },
+  pmapback: { n:'按映射表回写', d:'按映射规则批量写入字段', src:'pr' },
+  pclone:   { n:'克隆工作项', d:'复制到指定项目并关联', src:'pr' },
+  pdelay:   { n:'延迟执行', d:'N 分钟后异步触发', src:'pr' }
+};
+var ACT_ORDER = ['set_field','incr','assign','add_tag','comment','create_sub','relate','notify','http','webhook','trigger',
+                 'pscript','pmapback','pclone','pdelay'];
+var ACT_USERS = ['问题修改责任人','审核修改责任人','验证责任人','缺陷分配虚拟组','组件负责人'];
+var ACT_TAGS = ['待验证','免验证','需评审','芯片缺陷','高风险'];
+/* 可自增的数值字段 */
+var NUM_FIELDS = ['驳回次数','残留问题数','子工作项完成率','工时（小时）','剩余工时'];
+
+/* ============================ 工具 ============================ */
+function el(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function toast(m,k){ var t=el('toast'); t.className='toast show'+(k?' '+k:''); el('toastTx').textContent=m; clearTimeout(t._h); t._h=setTimeout(()=>{t.className='toast';},3200); }
+function catColor(c){ var x=STATE_CATS.filter(s=>s.n===c)[0]; return x?x.c:'tag-grey'; }
+function flowById(id){ return FLOWS.filter(f=>f.id===id)[0]; }
+function opValText(f){ return f.op==='empty'||f.op==='notempty' ? '' : f.v; }
+
+/* 内嵌模式：index.html 通过 ?embed=1 打开 */
+if(/[?&]embed=1/.test(location.search) && !/\bembed\b/.test(document.documentElement.className)){
+  document.documentElement.className += ' embed';
+}
+
+/* ============================ 一级导航 ============================ */
+function ic(p){ return '<span class="ic"><svg width="15" height="15" viewBox="0 0 16 16" fill="none">' + p + '</svg></span>'; }
+var S = 'stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"';
+var ICON = {
+  '工作台':   '<g ' + S + '><rect x="2.5" y="2.5" width="4.6" height="4.6" rx="1"/><rect x="8.9" y="2.5" width="4.6" height="4.6" rx="1"/><rect x="2.5" y="8.9" width="4.6" height="4.6" rx="1"/><rect x="8.9" y="8.9" width="4.6" height="4.6" rx="1"/></g>',
+  '产品管理': '<g ' + S + '><path d="M8 1.8l5.4 2.7v7L8 14.2l-5.4-2.7v-7L8 1.8z"/><path d="M2.6 4.5L8 7.3l5.4-2.8M8 7.3v6.9"/></g>',
+  '项目管理': '<g ' + S + '><rect x="2.5" y="2.5" width="4.4" height="11" rx="1"/><rect x="9.1" y="2.5" width="4.4" height="6.5" rx="1"/></g>',
+  '测试管理': '<g ' + S + '><circle cx="8" cy="8" r="6.2"/><path d="M5.4 8.2l1.8 1.8 3.4-3.8"/></g>',
+  '知识管理': '<g ' + S + '><path d="M2.6 3.4C4.5 2.4 7 2 8 3c1-1 3.5-.6 5.4.4v9.2c-1.9-1-4.4-1.4-5.4-.4-1-1-3.5-.6-5.4.4V3.4z"/><path d="M8 3v9.2"/></g>',
+  '效能度量': '<g ' + S + '><path d="M2.5 13.5h11"/><path d="M4.5 13V8.5M8 13V4.5M11.5 13V6.8"/></g>',
+  '协作空间': '<g ' + S + '><circle cx="6" cy="5.6" r="2.4"/><path d="M2.4 13c.4-2.4 1.8-3.8 3.6-3.8s3.2 1.4 3.6 3.8"/><circle cx="11.2" cy="6.4" r="1.9"/><path d="M10.8 9.3c1.6.2 2.6 1.4 2.9 3.2"/></g>',
+  '智能引擎': '<g ' + S + '><path d="M8.8 1.8L3.6 9h3.6l-.9 5.2L11.8 7H8.2l.6-5.2z"/></g>',
+  '工时管理': '<g ' + S + '><circle cx="8" cy="8" r="6.2"/><path d="M8 4.6V8l2.4 1.6"/></g>',
+  '定时报告': '<g ' + S + '><rect x="3.2" y="2.2" width="9.6" height="11.6" rx="1.2"/><path d="M5.6 6h4.8M5.6 8.6h4.8M5.6 11.2h3"/></g>',
+  '快捷链接': '<g ' + S + '><path d="M6.5 9.5l3-3"/><path d="M7.5 4.5l1.2-1.2a2.6 2.6 0 013.7 3.7L11.2 8.2"/><path d="M8.5 11.5l-1.2 1.2a2.6 2.6 0 01-3.7-3.7L4.8 7.8"/></g>',
+  '管理后台': '<g ' + S + '><circle cx="8" cy="8" r="2.2"/><path d="M8 1.6v2M8 12.4v2M1.6 8h2M12.4 8h2M3.5 3.5l1.4 1.4M11.1 11.1l1.4 1.4M12.5 3.5l-1.4 1.4M4.9 11.1l-1.4 1.4"/></g>'
+};
+var NAV = [
+  { g:'应用' }, { n:'工作台' }, { n:'产品管理' }, { n:'项目管理', on:true }, { n:'测试管理' }, { n:'知识管理' }, { n:'效能度量' },
+  { g:'协作' }, { n:'协作空间' }, { n:'智能引擎' },
+  { g:'其他' }, { n:'工时管理' }, { n:'定时报告' }, { n:'快捷链接' }
+];
+el('rail').innerHTML = NAV.map(function(x){
+  return x.g ? '<div class="rail-cap">' + x.g + '</div>'
+    : '<a' + (x.on ? ' class="on"' : '') + ' title="' + x.n + '">' + ic(ICON[x.n]) + '<span class="tx">' + x.n + '</span></a>';
+}).join('');
+el('railFoot').innerHTML = '<a title="管理后台">' + ic(ICON['管理后台']) + '<span class="tx">管理后台</span></a>';
+function toggleRail(){
+  var mini = el('railBox').classList.toggle('mini');
+  el('foldBtn').title = mini ? '' : '收起导航';
+  el('railLogo').title = mini ? '展开导航' : 'PingCode';
+}
+el('foldBtn').addEventListener('click', function(e){ e.stopPropagation(); toggleRail(); });
+el('railLogo').addEventListener('click', function(){ if(el('railBox').classList.contains('mini')) toggleRail(); });
+
+/* ============================ 规则计数 ============================ */
+function leafCount(g){ return (g.items || []).reduce(function(a, it){ return a + (it.t === 'g' ? leafCount(it) : 1); }, 0); }
+function condOnN(f){ return f.condOn ? leafCount(f.condOn) : 0; }
+function condN(f){ return f.conds ? leafCount(f.conds) : 0; }
+function formN(f){ return (f.form && f.form.groups) ? f.form.groups.reduce(function(a, g){ return a + g.fields.length; }, 0) : 0; }
+function hasRule(f){ return (condOnN(f) + condN(f) + f.acts.length) > 0; }
+
+/* ============================ 列表视图 ============================ */
+var VIEW = 'flow', ONLY_RULE = false, KW = '', CUR_FLOW = null;
+
+function filtered(){
+  return FLOWS.filter(f => {
+    if(ONLY_RULE && !hasRule(f)) return false;
+    if(KW && (f.n+f.from+f.to).toLowerCase().indexOf(KW.toLowerCase()) < 0) return false;
+    return true;
+  });
+}
+function renderBody(){
+  if(VIEW === 'flow') renderFlowList();
+  else if(VIEW === 'state') renderStateList();
+  else renderGraph();
+}
+function renderFlowList(){
+  var rows = filtered();
+  el('cnt').textContent = rows.length + ' 条流转';
+  el('body').innerHTML =
+    '<table class="tbl" style="margin:0 20px 20px;width:calc(100% - 40px)"><thead><tr>'
+    + '<th style="width:130px">流转</th><th style="width:250px">状态变更</th><th>规则</th><th style="width:110px">操作</th></tr></thead><tbody>'
+    + rows.map(function(f){
+        var nc = condOnN(f), nv = condN(f), nfm = formN(f);
+        return '<tr data-id="' + f.id + '">'
+          + '<td><b>' + esc(f.n) + '</b></td>'
+          + '<td><span class="flowcell"><span class="tag tag-grey">' + esc(f.from) + '</span><span class="to">→</span><span class="tag tag-blue">' + esc(f.to) + '</span></span></td>'
+          + '<td><span class="slot' + (nc?' on':'') + '">条件 ' + nc + '</span> <span class="slot' + (nv?' on':'') + '">校验 ' + nv + '</span> <span class="slot act' + (f.acts.length?' act':'') + '">后置 ' + f.acts.length + '</span>'
+          + ' <span class="slot fm' + (nfm ? ' on' : '') + '">表单 ' + nfm + '</span></td>'
+          + '<td><button class="linkbtn" data-edit="' + f.id + '" style="border:none;background:none;color:var(--primary);font-size:12.5px">配置</button></td>'
+          + '</tr>';
+      }).join('')
+    + '</tbody></table>';
+  el('body').querySelectorAll('tbody tr').forEach(tr => tr.addEventListener('click', e => {
+    if(e.target.closest('[data-edit]')) return;
+    openDrawer(tr.getAttribute('data-id'));
+  }));
+  el('body').querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); openDrawer(b.getAttribute('data-edit')); }));
+}
+function renderStateList(){
+  el('cnt').textContent = STATES.length + ' 个状态';
+  var html = '';
+  STATE_CATS.forEach(function(cat){
+    var list = STATES.filter(s => s.cat === cat.n);
+    if(!list.length) return;
+    html += '<div style="margin:16px 20px 8px;font-size:12.5px;color:var(--g600)"><span class="tag tag-pill tag-sm ' + cat.c + '">' + cat.n + '</span> <span style="margin-left:6px">' + list.length + ' 个状态</span></div>';
+    html += '<table class="tbl" style="margin:0 20px;border:1px solid var(--g200);border-radius:4px"><thead><tr><th style="width:200px">状态名称</th><th style="width:120px">类别</th><th>说明</th><th style="width:110px">操作</th></tr></thead><tbody>'
+      + list.map(s => '<tr><td><b>' + esc(s.n) + '</b></td><td><span class="tag tag-pill tag-sm ' + catColor(s.cat) + '">' + esc(s.cat) + '</span></td>'
+        + '<td style="color:var(--g600)">—</td><td><button class="linkbtn" data-stcfg="' + esc(s.n) + '" style="border:none;background:none;color:var(--primary);font-size:12.5px">配置</button></td></tr>').join('')
+      + '</tbody></table>';
+  });
+  el('body').innerHTML = html;
+  el('body').querySelectorAll('[data-stcfg]').forEach(function(b){
+    b.addEventListener('click', function(){
+      toast('「' + b.getAttribute('data-stcfg') + '」的流转规则请到「状态流转」页签，按入向流转配置', 'info');
+    });
+  });
+}
+
+/* ============================ 流程图视图 ============================ */
+var GRAPH_POS = {
+  '待处理':[26,40], '定位中':[246,40], '审核中':[466,40], '待验证':[686,40], '已验证':[906,40], '已关闭':[1126,40],
+  '挂起':[246,164], '已解决':[686,164], '驳回':[466,164]
+};
+function renderGraph(){
+  el('cnt').textContent = '状态 ' + STATES.length + ' 个 · 流转 ' + FLOWS.length + ' 条';
+  var pos = GRAPH_POS;
+  var inner = '<div class="cv-inner" style="width:1300px;height:290px">';
+  FLOWS.forEach(function(f){
+    var a = pos[f.from], b = pos[f.to];
+    if(!a || !b) return;
+    var x1 = a[0] + 136, y1 = a[1] + 28, x2 = b[0], y2 = b[1] + 28;
+    var dx = x2 - x1, dy = y2 - y1;
+    var len = Math.sqrt(dx*dx + dy*dy);
+    var ang = Math.atan2(dy, dx) * 180 / Math.PI;
+    var hr = hasRule(f);
+    inner += '<div class="edge' + (hr ? ' rl' : '') + '" style="left:' + x1 + 'px;top:' + y1 + 'px;width:' + Math.max(10, len - 7) + 'px;transform:rotate(' + ang + 'deg)">'
+      + '<span class="lbl" style="transform:translate(-50%,-50%) rotate(' + (-ang) + 'deg)">' + esc(f.n) + '</span>'
+      + '<span class="arw"></span></div>';
+  });
+  STATES.forEach(function(s){
+    var p = pos[s.n]; if(!p) return;
+    var cnt = FLOWS.filter(f => f.to === s.n && hasRule(f)).length;
+    inner += '<div class="node' + (cnt ? ' has' : '') + '" data-st="' + esc(s.n) + '" style="left:' + p[0] + 'px;top:' + p[1] + 'px">'
+      + '<div class="nm">' + esc(s.n) + '</div>'
+      + '<span class="tag tag-pill tag-sm ' + catColor(s.cat) + '">' + esc(s.cat) + '</span></div>';
+  });
+  inner += '</div>';
+  el('body').innerHTML =
+      '<div class="legend"><span><i style="background:var(--g300)"></i>无规则流转</span><span><i style="background:var(--primary)"></i>带规则流转</span><span><i style="background:var(--success)"></i>入向带规则的状态</span><span style="color:var(--g600)">点击状态可配置其入向流转</span></div>'
+    + '<div style="padding:10px 20px 20px;position:relative"><div class="canvas" id="gcv">' + inner + '</div></div>';
+  /* 流程图在窄容器里宽度会超出：给出可横向滚动的提示，避免看起来像被截断 */
+  var cv = el('gcv');
+  if(cv && cv.scrollWidth > cv.clientWidth + 4){
+    var tip = document.createElement('div');
+    tip.className = 'cv-tip';
+    tip.textContent = '⇄ 左右拖动查看完整流程';
+    cv.parentNode.appendChild(tip);
+  }
+  el('body').querySelectorAll('.node').forEach(function(n){
+    n.addEventListener('click', function(){
+      var nm = n.getAttribute('data-st');
+      var ins = FLOWS.filter(f => f.to === nm);
+      if(ins.length) openDrawer(ins[0].id);
+      else toast('「' + nm + '」没有入向流转');
+    });
+  });
+}
+function sid(n){ var s = STATES.filter(x => x.n === n)[0]; return s ? s.id : null; }
+
+/* ============================ 深度配置：抽屉 ============================ */
+var CTLS = { text:'单行文本', textarea:'多行文本', select:'下拉选择', member:'成员选择', date:'日期', number:'数字', link:'关联工作项' };
+var SIZES = { sm:'小 480', md:'中 640', lg:'大 880' };
+
+function opts(map, cur){
+  return Object.keys(map).map(k => '<option value="' + k + '"' + (k === cur ? ' selected' : '') + '>' + esc(map[k]) + '</option>').join('');
+}
+function actCfg(a){
+  var s = '';
+  if(a.t === 'assign'){
+    s = '<span>指派给</span>'
+      + '<select class="form-control" data-ak="who">' + ['审核修改责任人','验证责任人','缺陷分配虚拟组','按「子系统 → 责任人」映射表解析','按「模块 → 负责人」映射表解析','按「缺陷类型 → 负责人」映射表解析'].map(function(x){ return '<option' + (x===a.who?' selected':'') + '>' + esc(x) + '</option>'; }).join('') + '</select>';
+  } else if(a.t === 'add_tag' || a.t === 'create_sub'){
+    s = '<span>' + (a.t==='add_tag'?'添加标签':'子工作项类型') + '</span>'
+      + '<select class="form-control" data-ak="v">' + ACT_TAGS.map(function(x){ return '<option' + (x===a.v?' selected':'') + '>' + esc(x) + '</option>'; }).join('') + '</select>';
+  } else if(a.t === 'set_field'){
+    s = '<span>字段</span><select class="form-control" data-ak="f">' + FIELDS.map(function(x){ return '<option' + (x===a.f?' selected':'') + '>' + esc(x) + '</option>'; }).join('') + '</select>'
+      + '<span>值</span><select class="form-control" data-ak="v">' + ['固定值','按映射表解析','当前流转目标状态','当前用户','留空'].map(function(x){ return '<option' + (x===a.v?' selected':'') + '>' + esc(x) + '</option>'; }).join('') + '</select>';
+  } else if(a.t === 'comment'){
+    s = '<span>内容</span><input class="form-control" style="flex:1;min-width:200px" data-ak="v" value="' + esc(a.v || '') + '">';
+  } else if(a.t === 'incr'){
+    s = '<span>字段</span><select class="form-control" data-ak="f" style="min-width:150px">'
+      + NUM_FIELDS.map(function(x){ return '<option value="' + esc(x) + '"' + (x===a.f?' selected':'') + '>' + esc(x) + '</option>'; }).join('')
+      + '</select><span>每次 +</span><input class="form-control" style="width:64px" data-ak="v" value="' + esc(a.v || '1') + '">'
+      + '<span class="pr-note" style="flex:none">流转成功即累加；当前值 + 步长后整体写入</span>';
+  } else if(a.t === 'http'){
+    s = '<select class="form-control" data-ak="method" style="width:78px">' + ['POST','PUT','PATCH','GET'].map(function(x){ return '<option' + (x===(a.method||'POST')?' selected':'') + '>' + x + '</option>'; }).join('') + '</select>'
+      + '<input class="form-control mono" style="flex:1;min-width:200px" data-ak="url" value="' + esc(a.url || '') + '" placeholder="https://… 请求地址">';
+  } else if(a.t === 'notify' || a.t === 'relate' || a.t === 'trigger' || a.t === 'webhook'){
+    s = '<input class="form-control" style="flex:1;min-width:200px" data-ak="v" value="' + esc(a.v || a.url || '') + '" placeholder="配置参数">';
+  } else if(a.t === 'pscript'){
+    s = '<span>脚本</span><select class="form-control" data-ak="f" style="min-width:220px">'
+      + PR_SCRIPTS.post.map(function(x){ return '<option value="' + esc(x[0]) + '"' + (x[0]===a.f?' selected':'') + '>' + esc(x[0]) + '</option>'; }).join('')
+      + '</select><span class="pr-note"><code>Groovy</code>可读写当前工作项</span>';
+  } else if(a.t === 'pmapback'){
+    s = '<span>映射表</span><select class="form-control" data-ak="f">'
+      + ['子系统 → 责任人','模块 → 负责人','缺陷类型 → 负责人','客户 → 客户成功'].map(function(x){ return '<option value="' + esc(x) + '"' + (x===a.f?' selected':'') + '>' + esc(x) + '</option>'; }).join('')
+      + '</select><span>写入</span><select class="form-control" data-ak="v">'
+      + FIELDS.slice(0, 8).map(function(x){ return '<option' + (x===a.v?' selected':'') + '>' + esc(x) + '</option>'; }).join('')
+      + '</select>';
+  } else if(a.t === 'pclone'){
+    s = '<span>目标项目</span><select class="form-control" data-ak="f">'
+      + ['玄戒芯片研发项目','澎湃 OS 项目','车机平台项目'].map(function(x){ return '<option value="' + esc(x) + '"' + (x===a.f?' selected':'') + '>' + esc(x) + '</option>'; }).join('')
+      + '</select><span>类型</span><select class="form-control" data-ak="v">'
+      + ['缺陷','任务','需求'].map(function(x){ return '<option' + (x===a.v?' selected':'') + '>' + x + '</option>'; }).join('')
+      + '</select>';
+  } else if(a.t === 'pdelay'){
+    s = '<span>延迟</span><input class="form-control" style="width:64px" data-ak="v" value="' + esc(a.v || '30') + '">'
+      + '<span>分钟后执行，期间可取消</span>';
+  }
+  return '<div class="act-cfg">' + s + '</div>';
+}
+function actExtra(a){
+  return '<div class="act-cfg" style="color:var(--g500)">'
+    + '<span>执行</span><label class="ckrow"><input type="radio" class="ck" name="mode-' + a._i + '" data-am="mode" ' + (!a.mode||a.mode==='sync'?'checked':'') + '>同步</label>'
+    + '<label class="ckrow"><input type="radio" class="ck" name="mode-' + a._i + '" data-am="mode" ' + (a.mode==='async'?'checked':'') + '>异步</label>'
+    + '<span>失败重试</span><input class="form-control" style="width:62px" data-am="rt" value="' + (a.rt === undefined ? 3 : a.rt) + '">'
+    + '<span>次，间隔</span><input class="form-control" style="width:62px" data-am="rg" value="' + (a.rg === undefined ? 5 : a.rg) + '"><span>秒</span>'
+    + '</div>';
+}
+function previewForm(f){
+  var fm = el('fmask');
+  var gs = f.form.groups, size = SIZES[f.form.size || 'md'];
+  var wpx = (f.form.size === 'sm') ? 480 : (f.form.size === 'lg') ? 880 : 640;
+  var html = '<div class="fbox" style="width:' + wpx + 'px">'
+    + '<div class="fh" style="display:flex;align-items:center;gap:10px">'
+    +   '<span style="font-size:15px;font-weight:600">' + esc(f.form.title || (f.from + ' → ' + f.to)) + '</span>'
+    +   '<span class="tag tag-grey tag-pill">' + esc(size) + '</span>'
+    +   '<button class="fx" id="pfClose" title="关闭">×</button></div>'
+    + (gs.length > 1 ? '<div class="fm-tabs" id="fmTabs">' + gs.map((g, i) => '<button class="' + (i ? '' : 'on') + '" data-g="' + i + '">' + esc(g.name) + '</button>').join('') + '</div>' : '')
+    + '<div class="fb" id="fmBody">';
+  gs.forEach(function(g, gi){
+    html += '<div class="fm-pane' + (gi ? '' : ' on') + '" data-gp="' + gi + '">'
+      + g.fields.map((x, fi) => {
+          if(showOf(x) === 'no') return '';          /* 默认不显示 → 预览里不出现 */
+          var rq = reqOf(x), sh = showOf(x);
+          return '<div class="f-row" style="padding:6px 0"><label class="f-lbl" style="width:118px;text-align:right;font-size:13px;color:var(--g700);padding-top:6px">'
+          + (rq === 'no' ? '' : '<span style="color:var(--danger);margin-right:3px">*</span>') + esc(x.key)
+          + (rq === 'cond' ? '<span style="font-size:10px;color:var(--purple);margin-left:2px">条件</span>' : '')
+          + '</label>'
+          + '<div style="flex:1">'
+          + (x.ctl === 'textarea'
+              ? '<textarea class="form-control" style="height:auto;min-height:58px" data-pf="' + gi + '-' + fi + '" placeholder="' + esc(x.ph || '') + '"></textarea>'
+              : '<input class="form-control" data-pf="' + gi + '-' + fi + '" placeholder="' + esc(x.ph || (x.ctl === 'select' ? '请选择' : '')) + '" value="' + esc(x.def || '') + '">')
+          + (x.bind ? '' : '<span class="tag tag-grey" style="margin-left:6px">仅本次</span>')
+          + (sh === 'cond' ? '<div style="font-size:11px;color:var(--purple);margin-top:4px">满足显示条件后才出现</div>' : '')
+          + '</div></div>';
+        }).join('')
+      + '</div>';
+  });
+  html += '</div>'
+    + '<div class="ff"><span style="flex:1;font-size:12px;color:var(--g600)" id="pfMsg"></span>'
+    + '<button class="btn btn-default btn-lg" id="pfCancel">取消</button>'
+    + '<button class="btn btn-primary btn-lg" id="pfOk">' + esc(f.form.submitText || '提交并流转') + '</button></div></div>';
+  fm.innerHTML = html;
+  fm.classList.add('on');
+  var tabs = el('fmTabs');
+  if(tabs) tabs.addEventListener('click', function(e){
+    var b = e.target.closest('[data-g]'); if(!b) return;
+    this.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+    fm.querySelectorAll('.fm-pane').forEach(p => p.classList.toggle('on', p.getAttribute('data-gp') === b.getAttribute('data-g')));
+  });
+  function closeFm(){ fm.classList.remove('on'); }
+  el('pfCancel').addEventListener('click', closeFm);
+  el('pfClose').addEventListener('click', closeFm);
+  fm.addEventListener('click', function(e){ if(e.target === fm) closeFm(); });
+  el('pfOk').addEventListener('click', function(){
+    var miss = [];
+    gs.forEach(function(g, gi){
+      g.fields.forEach(function(x, fi){
+        if(reqOf(x) === 'no' || !x.bind) return;
+        var v = fm.querySelector('[data-pf="' + gi + '-' + fi + '"]').value.trim();
+        if(!v) miss.push(x.key);
+      });
+    });
+    if(miss.length){ el('pfMsg').innerHTML = '<span style="color:var(--danger)">请填写：' + miss.join('、') + '</span>'; return; }
+    fm.classList.remove('on');
+    var n = gs.reduce(function(a, g){ return a + g.fields.length; }, 0);
+    toast('已写入 ' + n + ' 项内容并完成「' + f.n + '」流转');
+  });
+}
+
+var DRAFT = null, DW_TAB = 'form';
+function openDrawer(id){
+  DRAFT = JSON.parse(JSON.stringify(flowById(id)));
+  DW_TAB = 'form';
+  draw();
+  el('mask').classList.add('on');
+  el('drawer').classList.add('on');
+}
+function closeDrawer(){ el('mask').classList.remove('on'); el('drawer').classList.remove('on'); DRAFT = null; }
+/* 供外层 index.html 调用：离开工作项配置时复位到初始态，避免残留抽屉 / 停在其他页签 */
+function wfReset(){
+  closeDrawer();
+  var fmk = el('fmask'); if(fmk) fmk.classList.remove('on');
+  VIEW = 'flow'; KW = ''; ONLY_RULE = false;
+  var q = el('q'); if(q){ q.textContent = '搜索流转'; q.style.visibility = ''; }
+  var or = el('onlyRule'); if(or) or.style.color = '';
+  var tb = el('tabs');
+  if(tb) qsa('[data-v]', tb).forEach(function(x){ x.classList.toggle('on', x.getAttribute('data-v') === 'flow'); });
+  renderBody();
+}
+
+function dwTabBtn(k, label, n, tags){
+  return '<button' + (DW_TAB === k ? ' class="on"' : '') + ' data-dwtab="' + k + '">' + label
+    + (n ? '<i class="cnt">' + n + '</i>' : '')
+    + (tags || '') + '</button>';
+}
+/* 页签右侧的彩色说明标签：标品升级（橙）/ 打通自动化（紫） */
+var DW_TAG_UP  = '<span class="tab-flag up">标品升级</span>';
+var DW_TAG_AUTO = '<span class="tab-flag auto">集成自动化</span>';
+
+function draw(){
+  var f = DRAFT;
+  var nf = condN(f), nc0 = condOnN(f), nAll = formN(f);
+  el('dwName').textContent = f.n;
+  var hasCfg = (nAll + nf + nc0 + f.acts.length) > 0;
+  el('dwBadge').className = 'tag tag-pill ' + (hasCfg ? 'tag-blue' : 'tag-grey');
+  el('dwBadge').textContent = hasCfg
+    ? ('条件 ' + nc0 + ' · 表单 ' + nAll + ' · 校验 ' + nf + ' · 动作 ' + f.acts.length)
+    : '未配置';
+  el('dwSub').textContent = '配置挂在这一条流转上，保存后立即对该工作项类型生效';
+
+  /* 流转路径条 */
+  el('dwStep').innerHTML = '<span class="sn">' + esc(f.from) + '</span>'
+    + '<span class="line"><i>' + esc(f.n) + '</i></span>'
+    + '<span class="sn cur">' + esc(f.to) + '</span>';
+
+  /* 页签：右侧带彩色说明标签 */
+  el('dwTabs').innerHTML = dwTabBtn('condOn', '流转条件', nc0, DW_TAG_UP)
+    + dwTabBtn('form', '流转表单', nAll, DW_TAG_UP)
+    + dwTabBtn('verify', '流转验证', nf, DW_TAG_UP)
+    + dwTabBtn('post', '后置动作', f.acts.length, DW_TAG_UP + DW_TAG_AUTO);
+
+  el('dwBody').innerHTML = DW_TAB === 'condOn' ? paneCond(f, 'condOn')
+    : DW_TAB === 'form' ? paneForm(f)
+    : DW_TAB === 'verify' ? paneCond(f, 'conds')
+    : panePost(f);
+  bind();
+
+  var bits = [];
+  if(nc0) bits.push('流转条件 ' + nc0 + ' 条');
+  if(nAll) bits.push('表单 ' + nAll + ' 项');
+  if(nf) bits.push('校验 ' + nf + ' 条');
+  if(f.acts.length) bits.push('后置动作 ' + f.acts.length + ' 个');
+  el('dwHint').innerHTML = bits.length ? '保存后对该类型的缺陷立即生效　·　' + bits.join(' · ') : '该流转未配置任何规则，等同于「所有人可流转、无附加动作」';
+}
+
+/* ---- 页签一：步骤页布局 ---- */
+function paneForm(f){
+  var used = [];
+  f.form.groups.forEach(function(g){ g.fields.forEach(function(x){ used.push(x.key); }); });
+  var avail = FIELDS.filter(function(x){ return used.indexOf(x) < 0; });
+  var h = '<div class="info-bar"><ol>'
+    + '<li>每个字段可设「<b>回写</b>」：勾选＝填的值<b>写进工作项属性</b>；不勾＝<b>只留在本次流转记录</b>里当备注，属性不变。</li>'
+    + '<li>「必填」支持<b>非必填 / 必填 / 条件必填</b>三态；条件必填按且或组合判断，同时承担这条流转的校验职责，提交时拦截。</li>'
+    + '<li>「显示」支持<b>显示 / 隐藏 / 条件显示</b>，隐藏的字段不出现在弹窗里；条件显示满足时才出现。<a href="#" onclick="return false">了解表单字段</a></li>'
+    + '</ol></div>'
+    + '<div class="sec-h">表单外观</div>'
+    + '<div class="spec-card"><div class="spec-grid">'
+    +   '<div><label class="lb">弹窗标题</label><input class="form-control" data-fs="title" value="' + esc(f.form.title || '') + '" placeholder="默认取流转名"></div>'
+    +   '<div><label class="lb">尺寸</label><select class="form-control" data-fs="size">' + opts(SIZES, f.form.size || 'md') + '</select></div>'
+    +   '<div><label class="lb">提交按钮文案</label><input class="form-control" data-fs="submitText" value="' + esc(f.form.submitText || '提交并流转') + '"></div>'
+    + '</div></div>';
+
+  if(!f.form.groups.length) h += '<div class="empty">未配置表单字段 —— 该流转时不会弹窗</div>';
+
+  if(f.form.groups.length){
+    h += '<div class="sec-h">字段组 <span>共 ' + formN(f) + ' 个字段 · ' + f.form.groups.length + ' 组</span></div>';
+  }
+  f.form.groups.forEach(function(g, gi){
+    h += '<div class="grp-box" data-gi="' + gi + '" data-drag="group">'
+      + '<div class="grp-hd"><span class="drag-h" title="按住上下拖动调整分组顺序"></span>'
+      + '<input class="form-control" data-gn="' + gi + '" style="width:150px;height:26px" value="' + esc(g.name) + '">'
+      + '<button class="btn btn-text btn-xs" style="margin-left:auto" data-gx="' + gi + '">删除分组</button></div>'
+      + '<div class="ftbl-hd"><span></span><span>字段</span><span>控件</span><span title="勾选＝值回写进工作项属性；不勾＝仅记录在本次流转">回写</span><span>必填</span><span>显示</span><span>占位提示</span><span>操作</span></div>';
+    g.fields.forEach(function(x, fi){
+      var rq = reqOf(x), sh = showOf(x);
+      h += '<div class="fld-cell" data-drag="field" data-gi="' + gi + '" data-fj="' + fi + '">'
+        + '<div class="fld">'
+        + '<span class="drag-h" title="按住上下拖动排序"></span>'
+        + '<span class="fk" title="' + esc(x.key) + '">' + (rq === 'no' ? '' : '<span style="color:var(--danger)">*</span>') + esc(x.key) + '</span>'
+        + '<select class="form-control" data-fx="ctl">' + opts(CTLS, x.ctl || 'text') + '</select>'
+        + '<label class="ckrow" style="justify-content:center"><input type="checkbox" class="ck" data-fx="bind"' + (x.bind ? ' checked' : '') + ' title="' + (x.bind ? '回写：填入的值写入工作项属性' : '仅本次：只记录在流转记录，不改属性') + '"></label>'
+        + '<select class="form-control" data-fm="req">' + reqOpts(rq) + '</select>'
+        + '<select class="form-control" data-fm="show">' + showOpts(sh) + '</select>'
+        + '<input class="form-control" data-fx="ph" value="' + esc(x.ph || '') + '" placeholder="占位提示">'
+        + '<span class="op"><button class="btn btn-danger btn-xs" data-fx-del="' + gi + '-' + fi + '">×</button></span></div>';
+      if(rq === 'cond' || sh === 'cond'){
+        h += '<div class="fld-cond">';
+        if(rq === 'cond') h += condPanel(gi, fi, 'req', x);
+        if(sh === 'cond') h += condPanel(gi, fi, 'show', x);
+        h += '</div>';
+      }
+      h += '</div>';
+    });
+    h += '</div>';
+  });
+
+  h += '<div style="display:flex;gap:10px;align-items:center">'
+    + (avail.length ? '<button class="btn-add" id="addField">+ 添加字段</button>' : '')
+    + '<button class="btn-sub" id="previewForm">预览表单</button></div>';
+  return h;
+}
+
+/* ---- 流转条件 / 流转验证：且或组合 + 层级嵌套（对应 Jira 条件分组） ---- */
+function pstr(p){ return p.length ? p.join('-') : 'r'; }
+function pparse(s){ return (s === 'r' || s === '') ? [] : s.split('-').map(Number); }
+function condNodeAt(root, path){
+  var n = root;
+  for(var i = 0; i < path.length; i++){ n = n.items[path[i]]; }
+  return n;
+}
+/* ================= 类型选择浮层（内置 / 来自 Ping Runner） =================
+   原生 select 的 option 放不了带底色的小标签，所以这里用自定义浮层；
+   分两组列出，Ping Runner 提供的项右侧带 src-chip。 */
+var DD_CTX = null;
+function ddGroups(kind){
+  var list;
+  if(kind === 'act'){
+    list = ACT_ORDER.map(function(k){ return { k:k, n:ACTS[k].n, d:ACTS[k].d, src:ACTS[k].src }; });
+  } else {
+    list = ((kind === 'valid') ? VALID_ORDER : COND_ORDER).map(function(k){
+      return { k:k, n:COND_KINDS[k].n, d:COND_KINDS[k].d, src:COND_KINDS[k].src };
+    });
+  }
+  return [
+    { n:(kind === 'act' ? '内置动作' : '内置条件'), items:list.filter(function(x){ return x.src === 'in'; }) },
+    { n:'来自 Ping Runner', items:list.filter(function(x){ return x.src === 'pr'; }) }
+  ];
+}
+function ddPopHTML(kind, cur){
+  return ddGroups(kind).map(function(g, gi){
+    if(!g.items.length) return '';
+    return (gi ? '<div class="dd-grp line"></div>' : '')
+      + '<div class="dd-grp">' + g.n + '</div>'
+      + g.items.map(function(x){
+          return '<button class="dd-it' + (x.k === cur ? ' on' : '') + '" data-dd-k="' + x.k + '">'
+            + '<span class="dd-n">' + esc(x.n) + '<i>' + esc(x.d) + '</i></span>'
+            + srcChip(x.src) + '</button>';
+        }).join('');
+  }).join('');
+}
+function openDD(btn, kind, cur, onPick){
+  var pop = el('ddPop'); if(!pop) return;
+  pop.innerHTML = ddPopHTML(kind, cur);
+  pop.classList.add('on');
+  var r = btn.getBoundingClientRect();
+  var w = pop.offsetWidth, ph = pop.offsetHeight;
+  var left = Math.max(8, Math.min(r.left, window.innerWidth - w - 12));
+  var top  = r.bottom + 4;
+  if(top + ph > window.innerHeight - 10) top = Math.max(8, r.top - ph - 4);
+  pop.style.left = left + 'px';
+  pop.style.top  = top + 'px';
+  DD_CTX = { kind:kind, onPick:onPick };
+}
+function closeDD(){ var p = el('ddPop'); if(p) p.classList.remove('on'); DD_CTX = null; }
+
+/* 新增条件的默认参数 */
+function newCond(k){
+  var it = { t:'c', kind:k };
+  if(k === 'field')            { it.f = '严重程度'; it.op = 'in'; it.v = ''; }
+  else if(k === 'system')      { it.f = '当前用户'; it.op = 'eq'; it.v = ''; }
+  else if(k === 'linked')      { it.f = '子工作项全部完成'; it.op = 'eq'; it.v = ''; }
+  else if(k === 'pscript')     { it.f = PR_SCRIPTS.cond[0][0]; }
+  else if(k === 'pjql')        { it.v = 'project = XD AND status != Done AND assignee = currentUser()'; }
+  else if(k === 'puattr')      { it.f = '当前用户所属部门'; it.op = 'eq'; it.v = ''; }
+  else if(k === 'pvalid')      { it.f = PR_SCRIPTS.valid[0][0]; }
+  else if(k === 'puniq')       { it.f = 'GerritID'; }
+  else if(k === 'ppattern')    { it.f = 'GerritID'; it.v = '^I[0-9a-f]{8,40}$'; }
+  return it;
+}
+/* 新增动作的默认参数 */
+function newAct(k){
+  var a = { t:k, mode:'sync', rt:3, rg:5 };
+  if(k === 'assign')          a.who = '审核修改责任人';
+  else if(k === 'set_field')  { a.f = '解决结果'; a.v = '固定值'; }
+  else if(k === 'add_tag')    a.v = ACT_TAGS[0];
+  else if(k === 'pscript')    a.f = PR_SCRIPTS.post[0][0];
+  else if(k === 'pmapback')   { a.f = '子系统 → 责任人'; a.v = '问题修改责任人'; }
+  else if(k === 'pclone')     { a.f = '玄戒芯片研发项目'; a.v = '缺陷'; }
+  else if(k === 'pdelay')     a.v = '30';
+  return a;
+}
+
+/* 来源标签：只有 Ping Runner 提供的才标 */
+function srcChip(src){ return src === 'pr' ? '<span class="src-chip">Ping Runner</span>' : ''; }
+function condRowHTML(it, path, scope){
+  scope = scope || 'cond';
+  function valCtl(x){
+    var vs = FIELD_VALS[x.f];
+    if(vs && vs.length){
+      return '<select class="form-control" data-ik="v">' + vs.map(function(v){
+        return '<option' + (v === x.v ? ' selected' : '') + '>' + esc(v) + '</option>';
+      }).join('') + '</select>';
+    }
+    return '<input class="form-control" data-ik="v" value="' + esc(x.v || '') + '" placeholder="值">';
+  }
+  var kind = COND_KINDS[it.kind] ? it.kind : 'field';
+  var kd = COND_KINDS[kind], isPr = kd.src === 'pr';
+  var xBtn = '<button class="btn btn-danger btn-xs" data-idx="' + path + '">×</button>';
+  var gateTag = (scope === 'cond')
+    ? '<span class="gate-tag ' + (kd.gate === 'show' ? 'tag-purple' : 'tag-orange') + '" title="' + (kd.gate === 'show' ? '不满足时流转入口不展示' : '入口照常展示，点击后校验并报错') + '">' + (kd.gate === 'show' ? '隐藏入口' : '点击校验') + '</span>'
+    : '';
+  var h = '<div class="cond-row' + (isPr ? ' pr-row' : '') + (gateTag ? ' gated' : '') + '" data-p="' + path + '" data-drag="cond">'
+    + '<span class="drag-h" title="按住上下拖动排序"></span>'
+    + '<button class="dd-btn" data-dd="kind" data-scope="' + scope + '" data-p="' + path + '" title="' + esc(kd.n + '：' + (kd.d || '')) + '">'
+    +   '<span class="dd-tx">' + esc(kd.n) + '</span>' + srcChip(kd.src) + gateTag + '<span class="dd-cr">▼</span>'
+    + '</button>';
+
+  if(kind === 'system'){
+    h += '<select class="form-control" data-ik="f">' + ['当前用户','当前用户所属角色','当前时间','当前迭代'].map(function(x){ return '<option' + (x===it.f?' selected':'') + '>' + x + '</option>'; }).join('') + '</select>'
+      +  '<select class="form-control" data-ik="op">' + OPS.map(function(o){ return '<option value="' + o + '"' + (o===it.op?' selected':'') + '>' + OP_TXT[o] + '</option>'; }).join('') + '</select>'
+      +  (['empty','notempty'].indexOf(it.op) < 0 ? '<input class="form-control" data-ik="v" value="' + esc(it.v || '') + '" placeholder="值">' : '<span class="cond-na">无需填写</span>')
+      +  xBtn;
+  } else if(kind === 'linked'){
+    h += '<select class="form-control" data-ik="f">' + ['子工作项全部完成','关联缺陷已关闭','存在未关闭的重复单','关联需求已上线'].map(function(x){ return '<option' + (x===it.f?' selected':'') + '>' + x + '</option>'; }).join('') + '</select>'
+      +  '<select class="form-control" data-ik="op">' + OPS.map(function(o){ return '<option value="' + o + '"' + (o===it.op?' selected':'') + '>' + OP_TXT[o] + '</option>'; }).join('') + '</select>'
+      +  (['empty','notempty'].indexOf(it.op) < 0 ? '<input class="form-control" data-ik="v" value="' + esc(it.v || '') + '" placeholder="值">' : '<span class="cond-na">无需填写</span>')
+      +  xBtn;
+  } else if(kind === 'field'){
+    h += '<select class="form-control" data-ik="f">' + FIELDS.map(function(x){ return '<option' + (x===it.f?' selected':'') + '>' + esc(x) + '</option>'; }).join('') + '</select>'
+      +  '<select class="form-control" data-ik="op">' + OPS.map(function(o){ return '<option value="' + o + '"' + (o===it.op?' selected':'') + '>' + OP_TXT[o] + '</option>'; }).join('') + '</select>'
+      +  (['empty','notempty'].indexOf(it.op) < 0 ? valCtl(it) : '<span class="cond-na">无需填写</span>')
+      +  xBtn;
+  } else if(kind === 'pscript' || kind === 'pvalid'){
+    var list = (kind === 'pscript') ? PR_SCRIPTS.cond : PR_SCRIPTS.valid;
+    h += '<select class="form-control" data-ik="f">' + list.map(function(x){ return '<option value="' + esc(x[0]) + '"' + (x[0]===it.f?' selected':'') + '>' + esc(x[0]) + '</option>'; }).join('') + '</select>'
+      +  '<span class="pr-note"><code>Groovy</code>' + (kind === 'pscript' ? '返回 true 放行 / false 拦截' : '返回错误文本即拦截提交')
+      +  (it.f ? '　<code>' + esc((list.filter(function(x){ return x[0] === it.f; })[0] || ['',''])[1]) + '</code>' : '') + '</span>'
+      +  xBtn;
+  } else if(kind === 'pjql'){
+    h += '<input class="form-control mono" data-ik="v" value="' + esc(it.v || '') + '" placeholder="project = XD AND status != Closed AND assignee = currentUser()">'
+      +  '<span class="pr-note">查到结果 → 放行；为空 → 拦截</span>' + xBtn;
+  } else if(kind === 'puattr'){
+    h += '<select class="form-control" data-ik="f">' + ['当前用户所属部门','当前用户角色','当前用户职级','当前用户所属组'].map(function(x){ return '<option' + (x===it.f?' selected':'') + '>' + x + '</option>'; }).join('') + '</select>'
+      +  '<select class="form-control" data-ik="op">' + OPS.map(function(o){ return '<option value="' + o + '"' + (o===it.op?' selected':'') + '>' + OP_TXT[o] + '</option>'; }).join('') + '</select>'
+      +  (['empty','notempty'].indexOf(it.op) < 0 ? '<input class="form-control" data-ik="v" value="' + esc(it.v || '') + '" placeholder="值">' : '<span class="cond-na">无需填写</span>')
+      +  xBtn;
+  } else if(kind === 'puniq'){
+    h += '<select class="form-control" data-ik="f">' + FIELDS.map(function(x){ return '<option' + (x===it.f?' selected':'') + '>' + esc(x) + '</option>'; }).join('') + '</select>'
+      +  '<span class="pr-note">在<b style="color:var(--g700)">当前项目</b>范围内唯一，重复则拦截</span>' + xBtn;
+  } else if(kind === 'ppattern'){
+    h += '<select class="form-control" data-ik="f">' + FIELDS.map(function(x){ return '<option' + (x===it.f?' selected':'') + '>' + esc(x) + '</option>'; }).join('') + '</select>'
+      +  '<input class="form-control mono" data-ik="v" value="' + esc(it.v || '') + '" placeholder="正则，如 ^I[0-9a-f]{8,40}$">' + xBtn;
+  }
+  return h + '</div>';
+}
+/* ---- 条件树渲染：连接词在行间，同层统一；组作为整体参与父层 ---- */
+function condRowText(it){
+  var kd = COND_KINDS[it.kind] || COND_KINDS.field;
+  if(kd.src === 'pr'){
+    var body;
+    if(it.kind === 'pjql')           body = 'PQL「' + esc(it.v || '') + '」';
+    else if(it.kind === 'ppattern')  body = esc(it.f || '') + ' 匹配 /' + esc(it.v || '') + '/';
+    else if(it.kind === 'puniq')     body = esc(it.f || '') + ' 项目内唯一';
+    else                             body = esc(it.f || kd.n);
+    return '<span class="src-chip">Ping Runner</span> ' + body;
+  }
+  var opTxt = OP_TXT[it.op] || it.op;
+  var needVal = ['empty','notempty'].indexOf(it.op) < 0;
+  /* 值为空时显式标出，回读一眼看出这条条件还缺什么 */
+  var valTxt = !needVal ? '' : (it.v ? ' 「' + esc(it.v) + '」' : ' <span style="color:var(--danger)">「未填值」</span>');
+  return esc(it.f) + ' ' + opTxt + valTxt;
+}
+function condSummary(g){
+  if(!g || !g.items || !g.items.length) return '';
+  var conn = (g.conn || 'AND') === 'OR' ? ' 或 ' : ' 且 ';
+  return g.items.map(function(it){
+    return (it.t === 'g') ? '（' + condSummary(it) + '）' : condRowText(it);
+  }).join(conn);
+}
+function condGroupHTML(g, path, depth, isRoot, scope){
+  scope = scope || 'cond';
+  var conn = g.conn || 'AND';
+  var h = '';
+  if(isRoot){
+    h += '<div class="cond-block">';
+  } else {
+    h += '<div class="cond-group"><div class="cond-group-hd"><span>条件组</span>'
+      + '<button class="btn btn-danger btn-xs" style="margin-left:auto" data-delg="' + pstr(path) + '">删除组</button></div>';
+  }
+  h += '<div class="cond-item-body">';
+  g.items.forEach(function(it, i){
+    if(i > 0){
+      h += '<div class="cond-conn"><select class="form-control csel" data-conn="' + pstr(path) + '">'
+        + '<option value="AND"' + (conn === 'AND' ? ' selected' : '') + '>且</option>'
+        + '<option value="OR"' + (conn === 'OR' ? ' selected' : '') + '>或</option>'
+        + '</select></div>';
+    }
+    var ip = path.concat([i]);
+    h += (it.t === 'g') ? condGroupHTML(it, ip, depth + 1, false, scope) : condRowHTML(it, pstr(ip), scope);
+  });
+  if(!g.items.length) h += '<div class="cond-none">暂无条件 —— 添加一条，否则等价于不限制</div>';
+  h += '</div>';
+  h += '<div class="cond-group-ft">'
+    +  '<button class="btn btn-text btn-xs" data-addc="' + pstr(path) + '" data-scope="' + scope + '">+ 条件</button>'
+    +  (depth < 1 ? '<button class="btn btn-text btn-xs" data-addg="' + pstr(path) + '">+ 条件组</button>' : '')
+    + '</div></div>';
+  return h;
+}
+
+function paneCond(f, kind){
+  var d = f[kind], isCond = (kind === 'condOn');
+  var scope = isCond ? 'cond' : 'valid';
+  var h = '<div class="info-bar"><ol>'
+    + (isCond
+      ? '<li><b>「人」和「状态」类条件控制入口展示</b>：不满足时流转入口不展示，用户看不到这个操作 —— 对应 Jira 的 Condition。</li>'
+        + '<li><b>其他属性、关联对象类条件在点击时校验</b>：入口照常展示，点击后不满足则提示「xx 条件不满足」并拦截，工作项状态不改变。</li>'
+        + '<li>条件支持<b>且 / 或</b>组合并可嵌套分组；每条条件右侧标注其效果（隐藏入口 / 点击校验）。</li>'
+      : '<li>不满足时<b>拦截提交</b>并提示，工作项状态不改变 —— 对应 Jira 的 Validator。</li>'
+        + '<li>用户能看到并点击该流转，但提交时被校验拦下；条件支持<b>且 / 或</b>组合并可嵌套分组。</li>')
+    + '<li>除内置类型外，可直接选用由 <b>Ping Runner</b> 注册的'
+    + (isCond ? '脚本条件 / PQL 条件' : '脚本校验 / 唯一性校验 / 正则校验')
+    + ' —— 等价于 Jira 里靠插件补进来的那些能力，但不需要单独装插件。</li>'
+    + '<li>同一层条件的关系保持一致；需要混用「且」和「或」时，添加<b>条件组</b>作为一个整体参与判断。</li>'
+    + '</ol></div>';
+
+  if(!d.items.length && !d.conn){
+    h += '<div class="empty">' + (isCond ? '未设置流转条件 —— 该流转对所有有权限的人展示'
+                                           : '未设置校验 —— 该流转提交时不做额外校验') + '</div>';
+    h += '<button class="btn-add" data-addc-init="' + kind + '" data-scope="' + scope + '">+ 添加条件</button>';
+    return h;
+  }
+  h += '<div data-cg="' + kind + '">' + condGroupHTML(d, [], 0, true, scope) + '</div>';
+  var sum = condSummary(d);
+  if(sum){
+    var eff;
+    if(isCond){
+      /* 按条件类型给出对应效果，与「隐藏入口 / 点击校验」标注一致 */
+      var gates = [];
+      (function walk(g){ g.items.forEach(function(x){ if(x.t === 'g') walk(x); else gates.push((COND_KINDS[x.kind] || COND_KINDS.field).gate); }); })(d);
+      var hasShow = gates.indexOf('show') >= 0, hasCheck = gates.indexOf('check') >= 0;
+      eff = (hasShow && hasCheck) ? '　→ 「人 / 状态」条件决定入口是否展示；其余条件点击时校验，不满足提示「条件不满足」并拦截'
+          : hasShow               ? '　→ 满足时展示流转入口，不满足则隐藏'
+          :                         '　→ 点击时校验：不满足提示「条件不满足」并拦截';
+    } else {
+      eff = '　→ 允许提交';
+    }
+    h += '<div class="cond-summary"><b>回读</b>' + sum + eff + '</div>';
+  }
+  return h;
+}
+
+/* ---- 页签三：后置动作 ---- */
+function panePost(f){
+  var h = '<div class="info-bar"><ol>'
+    + '<li>流转成功后<b>按顺序</b>依次执行，前一个失败不影响后续动作继续执行。</li>'
+    + '<li>动作执行失败<b>不会回滚流转</b>：按设置的重试次数自动重试，仍失败写入活动日志供人工处理。<a href="#" onclick="return false">了解后置动作</a></li>'
+    + '<li>除内置动作外，可选用由 <b>Ping Runner</b> 提供的能力（执行脚本 / 按映射表回写 / 克隆工作项 / 延迟执行）—— 对应 Jira 里靠插件补进来的 Post Function。</li>'
+    + '</ol></div>';
+
+  if(!f.acts.length) h += '<div class="empty">暂未设置后置动作 —— 流转后不自动执行任何操作</div>';
+
+  f.acts.forEach(function(a, i){
+    a._i = i;
+    var meta = ACTS[a.t] || ACTS.set_field;
+    h += '<div class="act-card" data-ai="' + i + '" data-drag="act">'
+      + '<div class="act-top"><span class="drag-h" title="按住上下拖动调整执行顺序"></span>'
+      + '<span class="nm">' + (i+1) + '. ' + esc(meta.n) + '</span>'
+      + srcChip(meta.src)
+      + '<span class="tag tag-grey">' + esc(meta.d) + '</span>'
+      + '<span class="op"><button class="btn btn-danger btn-xs" data-act-del="' + i + '">删除</button></span></div>'
+      + actCfg(a) + actExtra(a) + '</div>';
+  });
+
+  h += '<button class="btn-add" id="addAct">+ 添加动作</button>';
+  return h;
+}
+
+function fieldOf(f, gi, fi){ return f.form.groups[gi].fields[fi]; }
+/* 必填 / 显示：三态。兼容旧数据 req:true|false */
+function reqOf(x){ return x.req === 'cond' ? 'cond' : (x.req === false || x.req === 'no') ? 'no' : 'yes'; }
+function showOf(x){ return x.show === 'cond' ? 'cond' : x.show === 'no' ? 'no' : 'yes'; }
+function reqOpts(cur){
+  return [['no','非必填'],['yes','必填'],['cond','条件必填']].map(function(o){
+    return '<option value="' + o[0] + '"' + (o[0] === cur ? ' selected' : '') + '>' + o[1] + '</option>';
+  }).join('');
+}
+function showOpts(cur){
+  return [['yes','显示'],['no','隐藏'],['cond','条件显示']].map(function(o){
+    return '<option value="' + o[0] + '"' + (o[0] === cur ? ' selected' : '') + '>' + o[1] + '</option>';
+  }).join('');
+}
+var FC_OPEN = {};   /* 字段级条件面板展开状态，key = gi-fi-req|show */
+function condPanel(gi, fi, kind, x){
+  var key = kind === 'req' ? 'reqCond' : 'showCond';
+  if(!x[key]) x[key] = { conn:'AND', items:[] };
+  var d = x[key];
+  var title = kind === 'req' ? '必填条件' : '显示条件';
+  var sub   = kind === 'req' ? '满足时必填，否则可留空' : '满足时显示，否则隐藏';
+  var k2 = gi + '-' + fi + '-' + kind;
+  var open = FC_OPEN[k2] !== false;
+  var sum = condSummary(d);
+  return '<div class="fc-sec">'
+    + '<div class="fc-hd"><b>' + title + '</b><span class="fc-sub">' + sub + '</span>'
+    + (open ? '' : '<span class="fc-sum">' + (sum || '未设置条件') + '</span>')
+    + '<button class="fc-tg" data-fctg="' + k2 + '">' + (open ? '收起' : '展开') + '</button></div>'
+    + (open
+        ? '<div class="fc-bd">'
+          + '<div data-cg="f:' + gi + '-' + fi + ':' + key + '">' + condGroupHTML(d, [], 0, true, 'field') + '</div>'
+          + (sum ? '<div class="fc-read">回读　' + sum + '　→ 该字段' + (kind === 'req' ? '必填' : '显示') + '</div>' : '')
+          + '</div>'
+        : '')
+    + '</div>';
+}
+function moveField(f, gi, fi, d){
+  var g = f.form.groups[gi], t = g.fields[fi];
+  if(d < 0 && fi > 0){ g.fields[fi-1] = t; g.fields[fi] = g.fields[fi-1]; g.fields[fi-1] = t; }
+  if(d > 0 && fi < g.fields.length-1){ g.fields[fi+1] = t; g.fields[fi] = g.fields[fi+1]; g.fields[fi+1] = t; }
+}
+function moveGroup(f, gi, d){
+  var gs = f.form.groups, t = gs[gi];
+  var j = gi + d;
+  if(j < 0 || j >= gs.length) return;
+  gs[gi] = gs[j]; gs[j] = t;
+}
+
+function bind(){
+  var f = DRAFT;
+  qsa('[data-dwtab]').forEach(function(b){ b.addEventListener('click', function(){ DW_TAB = b.getAttribute('data-dwtab'); draw(); }); });
+  qsa('[data-fs]').forEach(function(i){ i.addEventListener('change', function(){ f.form[i.getAttribute('data-fs')] = i.value; draw(); }); });
+  qsa('[data-gn]').forEach(function(i){ i.addEventListener('change', function(){ f.form.groups[+i.getAttribute('data-gn')].name = i.value; }); });
+  qsa('[data-gu]').forEach(function(b){ b.addEventListener('click', function(){ moveGroup(f, +b.getAttribute('data-gu'), -1); draw(); }); });
+  qsa('[data-gd]').forEach(function(b){ b.addEventListener('click', function(){ moveGroup(f, +b.getAttribute('data-gd'), 1); draw(); }); });
+  qsa('[data-gx]').forEach(function(b){ b.addEventListener('click', function(){ f.form.groups.splice(+b.getAttribute('data-gx'), 1); draw(); }); });
+  var af = el('addField');
+  if(af) af.addEventListener('click', function(){
+    var g = f.form.groups[0];
+    if(!g){ f.form.groups.push({ id:'g' + (f.form.groups.length+1), name:'信息', fields:[] }); g = f.form.groups[0]; }
+    var used = []; f.form.groups.forEach(function(x){ x.fields.forEach(function(y){ used.push(y.key); }); });
+    var k = FIELDS.filter(function(x){ return used.indexOf(x) < 0; })[0];
+    if(!k) return;
+    g.fields.push({ key:k, ctl:'text', bind:true, req:true, ph:'', def:'' });
+    draw();
+  });
+  qsa('[data-fj]').forEach(function(row){
+    var gi = +row.getAttribute('data-gi'), fi = +row.getAttribute('data-fj');
+    qsa('[data-fx]', row).forEach(function(i){
+      i.addEventListener('change', function(){ fieldOf(f, gi, fi)[i.getAttribute('data-fx')] = i.type === 'checkbox' ? i.checked : i.value; });
+    });
+  });
+  qsa('[data-fm]').forEach(function(sel){
+    sel.addEventListener('change', function(){
+      var row = sel.closest('[data-fj]');
+      if(!row) return;
+      var gi = +row.getAttribute('data-gi'), fi = +row.getAttribute('data-fj');
+      var x = fieldOf(f, gi, fi), k = sel.getAttribute('data-fm'), v = sel.value;
+      if(k === 'req'){
+        x.req = v;
+        if(v === 'cond' && !x.reqCond) x.reqCond = { conn:'AND', items:[{ t:'c', kind:'field', f:'严重程度', op:'eq', v:'致命' }] };
+      } else {
+        x.show = v;
+        if(v === 'cond' && !x.showCond) x.showCond = { conn:'AND', items:[{ t:'c', kind:'field', f:'严重程度', op:'eq', v:'致命' }] };
+      }
+      if(v === 'cond') FC_OPEN[gi + '-' + fi + '-' + k] = true;   /* 刚切到条件态：默认展开 */
+      draw();
+    });
+  });
+  qsa('[data-fctg]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var k = b.getAttribute('data-fctg');
+      FC_OPEN[k] = FC_OPEN[k] === false ? true : false;
+      draw();
+    });
+  });
+  qsa('[data-fx-del]').forEach(function(b){ b.addEventListener('click', function(){ var a = b.getAttribute('data-fx-del').split('-'); f.form.groups[+a[0]].fields.splice(+a[1], 1); draw(); }); });
+  qsa('[data-fu]').forEach(function(b){ b.addEventListener('click', function(){ var a = b.getAttribute('data-fu').split('-'); moveField(f, +a[0], +a[1], -1); draw(); }); });
+  qsa('[data-fd]').forEach(function(b){ b.addEventListener('click', function(){ var a = b.getAttribute('data-fd').split('-'); moveField(f, +a[0], +a[1], 1); draw(); }); });
+
+  qsa('[data-cg]').forEach(function(box){
+    var spec = box.getAttribute('data-cg');
+    var root;
+    if(spec.indexOf('f:') === 0){
+      /* 字段级条件：f:<gi>-<fi>:<reqCond|showCond> */
+      var seg = spec.split(':'), pp = seg[1].split('-');
+      var fx = fieldOf(f, +pp[0], +pp[1]);
+      if(!fx[seg[2]]) fx[seg[2]] = { conn:'AND', items:[] };
+      root = fx[seg[2]];
+    } else {
+      root = f[spec];
+    }
+    function node(p){ return condNodeAt(root, pparse(p)); }
+    function parentOf(p){
+      var a = pparse(p);
+      var last = a.pop();
+      return { group: condNodeAt(root, a), idx: last };
+    }
+    qsa('[data-conn]', box).forEach(function(sel){
+      sel.addEventListener('change', function(){
+        var n = node(sel.getAttribute('data-conn'));
+        n.conn = sel.value; delete n.logic; draw();
+      });
+    });
+    qsa('[data-addc]', box).forEach(function(b){
+      b.addEventListener('click', function(e){
+        e.stopPropagation();
+        var g = node(b.getAttribute('data-addc'));
+        var sc = b.getAttribute('data-scope') || 'cond';
+        openDD(b, sc, null, function(k){ g.items.push(newCond(k)); draw(); });
+      });
+    });
+    qsa('[data-dd="kind"]', box).forEach(function(b){
+      b.addEventListener('click', function(e){
+        e.stopPropagation();
+        var p = b.getAttribute('data-p');
+        var sc = b.getAttribute('data-scope') || 'cond';
+        openDD(b, sc, (node(p).kind || 'field'), function(k){
+          var it = node(p);
+          it.t = 'c'; it.kind = k;
+          delete it.f; delete it.op; delete it.v;
+          var n = newCond(k);
+          if(n.f !== undefined) it.f = n.f;
+          if(n.op !== undefined) it.op = n.op;
+          if(n.v !== undefined) it.v = n.v;
+          draw();
+        });
+      });
+    });
+    qsa('[data-addg]', box).forEach(function(b){
+      b.addEventListener('click', function(){
+        var g = node(b.getAttribute('data-addg'));
+        g.items.push({ t:'g', conn:'OR', items:[{ t:'c', kind:'field', f:'严重程度', op:'in', v:'' }] });
+        draw();
+      });
+    });
+    qsa('[data-delg]', box).forEach(function(b){
+      b.addEventListener('click', function(){
+        var par = parentOf(b.getAttribute('data-delg'));
+        par.group.items.splice(par.idx, 1); draw();
+      });
+    });
+    qsa('[data-idx]', box).forEach(function(b){
+      b.addEventListener('click', function(){
+        var par = parentOf(b.getAttribute('data-idx'));
+        par.group.items.splice(par.idx, 1); draw();
+      });
+    });
+    qsa('[data-p]', box).forEach(function(row){
+      var p = row.getAttribute('data-p');
+      qsa('[data-ik]', row).forEach(function(i){
+        i.addEventListener('change', function(){
+          var it = node(p), k = i.getAttribute('data-ik');
+          it[k] = i.value;
+          /* 换字段后，原值不在新字段的候选里就取第一个候选，避免留下矛盾的条件 */
+          if(k === 'f' && FIELD_VALS[it.f] && FIELD_VALS[it.f].indexOf(it.v) < 0) it.v = FIELD_VALS[it.f][0];
+          draw();
+        });
+      });
+    });
+  });
+  qsa('[data-addc-init]').forEach(function(b){
+    b.addEventListener('click', function(e){
+      e.stopPropagation();
+      var k = b.getAttribute('data-addc-init');
+      var sc = b.getAttribute('data-scope') || 'cond';
+      openDD(b, sc, null, function(kk){
+        f[k].conn = 'AND';
+        f[k].items = [newCond(kk)];
+        draw();
+      });
+    });
+  });
+
+  var aa = el('addAct');
+  if(aa) aa.addEventListener('click', function(e){
+    e.stopPropagation();
+    openDD(aa, 'act', null, function(k){ f.acts.push(newAct(k)); draw(); });
+  });
+  qsa('[data-ai]').forEach(function(card){
+    var i = +card.getAttribute('data-ai');
+    qsa('[data-ak]', card).forEach(function(inp){
+      inp.addEventListener('change', function(){ f.acts[i][inp.getAttribute('data-ak')] = inp.value; draw(); });
+    });
+    qsa('[data-am]', card).forEach(function(inp){
+      inp.addEventListener('change', function(){
+        if(inp.type === 'radio') f.acts[i].mode = inp.value;
+        else f.acts[i][inp.getAttribute('data-am')] = +inp.value;
+      });
+    });
+  });
+  qsa('[data-act-del]').forEach(function(b){ b.addEventListener('click', function(){ f.acts.splice(+b.getAttribute('data-act-del'), 1); draw(); }); });
+  qsa('[data-act-up]').forEach(function(b){ b.addEventListener('click', function(){ var i=+b.getAttribute('data-act-up'); var t=f.acts[i]; f.acts[i]=f.acts[i-1]; f.acts[i-1]=t; draw(); }); });
+  qsa('[data-act-down]').forEach(function(b){ b.addEventListener('click', function(){ var i=+b.getAttribute('data-act-down'); var t=f.acts[i]; f.acts[i]=f.acts[i+1]; f.acts[i+1]=t; draw(); }); });
+  var pf = el('previewForm');
+  if(pf) pf.addEventListener('click', function(){ previewForm(f); });
+  bindDrag();
+}
+function qsa(sel, root){
+  return Array.prototype.slice.call((root || document).querySelectorAll(sel));
+}
+
+/* ================= 拖拽排序：把手 hover 才出现，按住上下拖 ================= */
+var DRAG = null;
+function rootOfCg(spec){
+  if(spec.indexOf('f:') === 0){
+    var seg = spec.split(':'), pp = seg[1].split('-');
+    var fx = fieldOf(DRAFT, +pp[0], +pp[1]);
+    if(!fx[seg[2]]) fx[seg[2]] = { conn:'AND', items:[] };
+    return fx[seg[2]];
+  }
+  return DRAFT[spec];
+}
+function kidsOf(parent, cls){
+  return Array.prototype.filter.call(parent.children, function(x){ return x.classList && x.classList.contains(cls); });
+}
+function commitDrag(kind, parent){
+  if(!parent || !DRAFT) return;
+  var f = DRAFT, changed = false;
+  if(kind === 'group'){
+    var boxes = kidsOf(parent, 'grp-box');
+    if(boxes.length > 1){
+      var og = f.form.groups.slice();
+      f.form.groups = boxes.map(function(b){ return og[+b.getAttribute('data-gi')]; }).filter(Boolean);
+      changed = true;
+    }
+  } else if(kind === 'field'){
+    var gi = +parent.getAttribute('data-gi');
+    var cells = kidsOf(parent, 'fld-cell');
+    if(cells.length > 1 && f.form.groups[gi]){
+      var of = f.form.groups[gi].fields.slice();
+      f.form.groups[gi].fields = cells.map(function(c){ return of[+c.getAttribute('data-fj')]; }).filter(Boolean);
+      changed = true;
+    }
+  } else if(kind === 'act'){
+    var cards = kidsOf(parent, 'act-card');
+    if(cards.length > 1){
+      var oa = f.acts.slice();
+      f.acts = cards.map(function(c){ return oa[+c.getAttribute('data-ai')]; }).filter(Boolean);
+      changed = true;
+    }
+  } else if(kind === 'cond'){
+    var rows = kidsOf(parent, 'cond-row');
+    if(rows.length > 1){
+      var box = parent.closest('[data-cg]');
+      if(box){
+        var root = rootOfCg(box.getAttribute('data-cg'));
+        var arr = rows[0].getAttribute('data-p').split('-'); arr.pop();
+        var grp = condNodeAt(root, arr.map(Number));
+        var oc = grp.items.slice();
+        grp.items = rows.map(function(r){
+          var pp = r.getAttribute('data-p').split('-');
+          return oc[+pp[pp.length-1]];
+        }).filter(Boolean);
+        changed = true;
+      }
+    }
+  }
+  if(changed) draw();
+}
+function bindDrag(){
+  qsa('.drag-h').forEach(function(h){
+    h.addEventListener('mousedown', function(){
+      var row = h.closest('[data-drag]');
+      if(row) row.setAttribute('draggable', 'true');
+    });
+    h.addEventListener('click', function(e){ e.stopPropagation(); });
+  });
+  qsa('[data-drag]').forEach(function(row){
+    /* 事件会从里层行冒泡到外层分组，必须确认事件归属的就是本层 */
+    function mine(e){
+      var n = e.target && e.target.closest ? e.target.closest('[data-drag]') : null;
+      return n === row;
+    }
+    row.addEventListener('mouseup', function(){ if(!DRAG) row.removeAttribute('draggable'); });
+    row.addEventListener('dragstart', function(e){
+      if(!mine(e)) return;
+      e.stopPropagation();
+      DRAG = { el: row, parent: row.parentNode, kind: row.getAttribute('data-drag') };
+      row.classList.add('dragging');
+      try{ e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', 'x'); }catch(_){}
+    });
+    row.addEventListener('dragover', function(e){
+      if(!mine(e)) return;
+      if(!DRAG || DRAG.el === row || DRAG.parent !== row.parentNode) return;
+      /* 条件组里混有子组时不支持拖动，避免索引错位 */
+      if(row.parentNode.querySelector('.cond-group')) return;
+      e.preventDefault(); e.stopPropagation();
+      var r = row.getBoundingClientRect();
+      var after = (e.clientY - r.top) > r.height / 2;
+      var ref = after ? row.nextElementSibling : row;
+      row.parentNode.insertBefore(DRAG.el, ref);
+    });
+    row.addEventListener('drop', function(e){ if(mine(e)) e.preventDefault(); });
+    row.addEventListener('dragend', function(e){
+      if(!mine(e)) return;
+      row.removeAttribute('draggable');
+      row.classList.remove('dragging');
+      if(DRAG){ commitDrag(DRAG.kind, DRAG.el.parentNode); DRAG = null; }
+    });
+  });
+}
+
+/* 类型选择浮层：选中 / 关闭 */
+document.addEventListener('click', function(e){
+  var pop = el('ddPop');
+  if(!pop || !pop.classList.contains('on')) return;
+  var t = e.target;
+  if(pop.contains(t) && t.closest('.dd-it')){
+    var k = t.closest('.dd-it').getAttribute('data-dd-k');
+    var fn = DD_CTX && DD_CTX.onPick;
+    closeDD();
+    if(fn) fn(k);
+    return;
+  }
+  if(pop.contains(t)) return;
+  if(t.closest('.dd-btn') || t.closest('[data-addc]') || t.closest('[data-addc-init]') || t.closest('#addAct')) return;
+  closeDD();
+});
+window.addEventListener('resize', closeDD);
+
+/* ============================ 交互 ============================ */
+el('tabs').addEventListener('click', function(e){
+  var b = e.target.closest('[data-v]'); if(!b) return;
+  VIEW = b.getAttribute('data-v');
+  this.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+  el('q').textContent = VIEW === 'state' ? '搜索状态' : '搜索流转';
+  el('q').style.visibility = VIEW === 'graph' ? 'hidden' : '';   /* 流程图视图下搜索无意义 */
+  if(window.parent !== window) window.parent.postMessage({ t:'wf:view', v:VIEW }, '*');
+  renderBody();
+});
+el('q').addEventListener('input', function(){ KW = this.textContent.trim(); renderBody(); });
+el('onlyRule').addEventListener('click', function(){
+  ONLY_RULE = !ONLY_RULE;
+  this.style.color = ONLY_RULE ? 'var(--primary)' : '';
+  renderBody();
+});
+el('localSw').addEventListener('click', function(){
+  this.classList.toggle('on');
+  toast(this.classList.contains('on') ? '已开启本地配置，本类型配置与全局隔离' : '已恢复跟随全局配置');
+});
+
+/* ---- 抽屉：× / 取消 / 点遮罩 / Esc 关闭；保存写回 ---- */
+el('dwClose').addEventListener('click', function(){ closeDrawer(); });
+el('dwCancel').addEventListener('click', function(){ closeDrawer(); });
+el('mask').addEventListener('click', function(){ closeDrawer(); });
+el('dwSave').addEventListener('click', function(){
+  if(!DRAFT) return;
+  var name = DRAFT.n, idx = -1;
+  for(var i = 0; i < FLOWS.length; i++){ if(FLOWS[i].id === DRAFT.id){ idx = i; break; } }
+  if(idx >= 0) FLOWS[idx] = JSON.parse(JSON.stringify(DRAFT));
+  closeDrawer();
+  renderBody();
+  toast('已保存「' + name + '」的流转配置');
+});
+document.addEventListener('keydown', function(e){
+  if(e.key !== 'Escape' && e.keyCode !== 27) return;
+  var fmk = el('fmask');
+  if(fmk && fmk.classList.contains('on')){ fmk.classList.remove('on'); return; }
+  if(el('drawer').classList.contains('on')) closeDrawer();
+});
+/* 外层 index.html 在切走页面时通知复位 */
+window.addEventListener('message', function(e){
+  if(e.data && e.data.t === 'wf:reset') wfReset();
+});
+
+renderBody();
+</script>
+</body>
+</html>
